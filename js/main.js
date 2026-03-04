@@ -628,7 +628,7 @@ const PLATFORM_ICONS = {
   },
   instagram: {
     label: '인스타그램',
-    svg: pfSvg(`<defs><radialGradient id="ig1" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="url(#ig1)"/><rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/><circle cx="12" cy="12" r="4.8" stroke="white" stroke-width="1.8" fill="none"/><circle cx="17.8" cy="6.2" r="1.4" fill="white"/>`)
+    svg: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;"><defs><radialGradient id="igG" cx="30%" cy="105%" r="130%" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#FFD600"/><stop offset="18%" stop-color="#FF6B00"/><stop offset="38%" stop-color="#FF0069"/><stop offset="65%" stop-color="#C9007A"/><stop offset="100%" stop-color="#6600FF"/></radialGradient></defs><rect x="1" y="1" width="18" height="18" rx="5.5" fill="url(#igG)"/><circle cx="10" cy="10" r="3.6" stroke="white" stroke-width="1.5" fill="none"/><circle cx="14.8" cy="5.2" r="1.1" fill="white"/></svg>`
   },
   facebook: {
     label: '페이스북',
@@ -648,7 +648,7 @@ const PLATFORM_ICONS = {
   },
   slack: {
     label: '슬랙',
-    svg: pfSvg(`<path d="M5.042 15.165a2.528 2.528 0 01-2.52 2.523A2.528 2.528 0 010 15.165a2.527 2.527 0 012.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 012.521-2.52 2.527 2.527 0 012.521 2.52v6.313A2.528 2.528 0 018.834 24a2.528 2.528 0 01-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 01-2.521-2.52A2.528 2.528 0 018.834 0a2.527 2.527 0 012.521 2.522v2.52H8.834zm0 1.271a2.527 2.527 0 012.521 2.521 2.527 2.527 0 01-2.521 2.521H2.522A2.528 2.528 0 010 8.834a2.528 2.528 0 012.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 012.522-2.521A2.528 2.528 0 0124 8.834a2.527 2.527 0 01-2.522 2.521h-2.522V8.834zm-1.268 0a2.527 2.527 0 01-2.523 2.521 2.526 2.526 0 01-2.52-2.521V2.522A2.527 2.527 0 0115.165 0a2.528 2.528 0 012.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 012.523 2.522A2.528 2.528 0 0115.165 24a2.527 2.527 0 01-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 01-2.52-2.523 2.526 2.526 0 012.52-2.52h6.313A2.527 2.527 0 0124 15.165a2.528 2.528 0 01-2.522 2.523h-6.313z" fill="#4A154B"/>`, '#4A154B', '0 0 24 24')
+    svg: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;"><g><!-- 빨강(상단좌) --><rect x="2" y="6.5" width="5.5" height="2.2" rx="1.1" fill="#E01E5A"/><rect x="2" y="4" width="2.2" height="5" rx="1.1" fill="#E01E5A"/><circle cx="3.1" cy="3.1" r="1.8" fill="#E01E5A"/><!-- 노랑(하단우) --><rect x="12.5" y="11.3" width="5.5" height="2.2" rx="1.1" fill="#ECB22E"/><rect x="15.8" y="11" width="2.2" height="5" rx="1.1" fill="#ECB22E"/><circle cx="16.9" cy="16.9" r="1.8" fill="#ECB22E"/><!-- 초록(상단우) --><rect x="11.3" y="2" width="2.2" height="5" rx="1.1" fill="#2EB67D"/><rect x="11" y="2" width="5" height="2.2" rx="1.1" fill="#2EB67D"/><circle cx="16.9" cy="3.1" r="1.8" fill="#2EB67D"/><!-- 파랑(하단좌) --><rect x="6.5" y="11.3" width="2.2" height="6.7" rx="1.1" fill="#36C5F0"/><rect x="2" y="11.3" width="5" height="2.2" rx="1.1" fill="#36C5F0"/><circle cx="3.1" cy="16.9" r="1.8" fill="#36C5F0"/></g></svg>`
   },
   email: {
     label: '이메일',
@@ -656,11 +656,11 @@ const PLATFORM_ICONS = {
   },
   phone: {
     label: '번호',
-    svg: pfSvg(`<rect x="7" y="1" width="10" height="22" rx="3" stroke="#a78bfa" stroke-width="1.8" fill="none"/><circle cx="12" cy="18.5" r="1.2" fill="#a78bfa"/><line x1="10" y1="5" x2="14" y2="5" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round"/>`)
+    svg: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;"><rect x="5.5" y="1.5" width="9" height="17" rx="2" stroke="#a78bfa" stroke-width="1.6" fill="none"/><rect x="7.5" y="3.5" width="5" height="1.2" rx="0.6" fill="#a78bfa" opacity="0.5"/><circle cx="10" cy="16.2" r="1" fill="#a78bfa"/></svg>`
   },
   website: {
     label: '홈페이지',
-    svg: pfSvg(`<path d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1H5a1 1 0 01-1-1V10.5z" stroke="#34d399" stroke-width="1.8" fill="none" stroke-linejoin="round"/><path d="M9 22V13h6v9" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`)
+    svg: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;"><path d="M2.5 9L10 2.5 17.5 9V18H13v-5H7v5H2.5V9z" stroke="#34d399" stroke-width="1.6" stroke-linejoin="round" fill="none"/></svg>`
   },
   etc: {
     label: '기타',
@@ -1017,7 +1017,7 @@ function loadAdminInquiries() {
     </tr>`;
   }).join('')
     : '<tr><td colspan="13" style="text-align:center;padding:40px;color:var(--text3);">문의 내역이 없습니다.</td></tr>';
-
+}
 
 function viewInquiry(id) {
   const list = MM_DATA.getInquiries();
