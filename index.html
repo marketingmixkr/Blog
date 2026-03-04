@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.telegram.org https://api.ipify.org; object-src 'none'; base-uri 'self';">
   <meta name="description" content="MarketingMix - 마케팅 자동화, 챗봇 개발, 홈페이지 제작 전문">
   <title>MarketingMix — 마케팅 자동화 & 개발 포트폴리오</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -559,7 +560,7 @@
 
 <!-- ── Scripts ── -->
 <script src="js/data.js"></script>
-<script src="js/main.js"></script>
+<script src="js/main.js" referrerpolicy="no-referrer"></script>
 <script>
 function boardCatActive(el) {
   document.querySelectorAll('.board-cat-btns .tab-btn').forEach(b => b.classList.remove('active'));
