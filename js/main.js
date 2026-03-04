@@ -606,23 +606,59 @@ function initSearch() {
 // ══════════════════════════════════
 // PROJECT LIST
 // ══════════════════════════════════
+// SVG 아이콘 렌더 헬퍼
+function pfSvg(path, color='currentColor', vb='0 0 24 24') {
+  return `<svg width="20" height="20" viewBox="${vb}" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;">${path}</svg>`;
+}
+
 const PLATFORM_ICONS = {
-  program:   { icon:'💻', label:'프로그램' },
-  naver:     { icon:'🟢', label:'네이버' },
-  google:    { icon:'🔵', label:'구글' },
-  instagram: { icon:'📸', label:'인스타그램' },
-  facebook:  { icon:'👤', label:'페이스북' },
-  discord:   { icon:'🎮', label:'디스코드' },
-  slack:     { icon:'💬', label:'슬랙' },
-  email:     { icon:'📧', label:'이메일' },
-  phone:     { icon:'📱', label:'번호' },
-  website:   { icon:'🌐', label:'홈페이지' },
-  etc:       { icon:'📌', label:'기타' },
+  // ↓ svg 필드: pfSvg(path, color) 결과 문자열. label은 툴팁에 표시됩니다.
+  // 새 플랫폼 추가 시: key 추가 후 index.html <select id="pj_platform">에도 같은 value로 <option> 추가.
+  program: {
+    label: '프로그램',
+    svg: pfSvg(`<rect x="2" y="3" width="20" height="14" rx="2" stroke="#94a3b8" stroke-width="1.8" fill="none"/><path d="M8 21h8M12 17v4" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"/><path d="M6 8l3 3-3 3" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="13" y1="14" x2="18" y2="14" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"/>`)
+  },
+  naver: {
+    label: '네이버',
+    svg: pfSvg(`<rect width="24" height="24" rx="5" fill="#03C75A"/><path d="M5 18V6h4.2l4.6 7V6H18v12h-4.2L9.2 11v7H5z" fill="white"/>`)
+  },
+  google: {
+    label: '구글',
+    svg: pfSvg(`<path d="M21.8 12.2c0-.7-.1-1.3-.2-1.9H12v3.6h5.5c-.2 1.2-.9 2.3-2 2.9v2.4h3.2c1.9-1.7 3-4.3 3-7z" fill="#4285F4"/><path d="M12 22c2.7 0 5-0.9 6.7-2.4l-3.2-2.5c-.9.6-2 1-3.5 1-2.7 0-4.9-1.8-5.7-4.2H3v2.5C4.7 19.9 8.1 22 12 22z" fill="#34A853"/><path d="M6.3 13.9c-.2-.6-.3-1.2-.3-1.9s.1-1.3.3-1.9V7.6H3C2.4 8.8 2 10.4 2 12s.4 3.2 1 4.4l3.3-2.5z" fill="#FBBC05"/><path d="M12 5.8c1.5 0 2.9.5 4 1.5l3-3C17 2.6 14.7 2 12 2 8.1 2 4.7 4.1 3 7.6l3.3 2.6C7.1 7.6 9.3 5.8 12 5.8z" fill="#EA4335"/>`)
+  },
+  instagram: {
+    label: '인스타그램',
+    svg: pfSvg(`<defs><linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="25%" stop-color="#e6683c"/><stop offset="50%" stop-color="#dc2743"/><stop offset="75%" stop-color="#cc2366"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig)"/><circle cx="12" cy="12" r="4.5" stroke="white" stroke-width="1.6" fill="none"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/>`)
+  },
+  facebook: {
+    label: '페이스북',
+    svg: pfSvg(`<rect width="24" height="24" rx="5" fill="#1877F2"/><path d="M16 8h-2a1 1 0 00-1 1v2h3l-.5 3H13v7h-3v-7H8v-3h2V9a4 4 0 014-4h2v3z" fill="white"/>`)
+  },
+  discord: {
+    label: '디스코드',
+    svg: pfSvg(`<rect width="24" height="24" rx="5" fill="#5865F2"/><path d="M16.5 6.5S15 5.5 13 5.3l-.2.4c1.7.4 2.5 1 3.3 1.8C14.8 7 13.4 6.5 12 6.5s-2.8.5-4.1 1c.8-.8 1.7-1.5 3.4-1.8L11 5.3C9 5.5 7.5 6.5 7.5 6.5S5.9 9 5.5 14c1.5 1.7 3.8 1.8 3.8 1.8l.7-1a5 5 0 01-2.3-1.6c.8.6 2 1.2 4.3 1.2s3.5-.6 4.3-1.2a5 5 0 01-2.3 1.6l.7 1s2.3-.1 3.8-1.8c-.4-5-2-7.5-2-7.5zM10 12.3a1.3 1.3 0 110-2.6 1.3 1.3 0 010 2.6zm4 0a1.3 1.3 0 110-2.6 1.3 1.3 0 010 2.6z" fill="white"/>`)
+  },
+  slack: {
+    label: '슬랙',
+    svg: pfSvg(`<path d="M6.5 14.5a1.5 1.5 0 01-3 0 1.5 1.5 0 013 0V14.5z" fill="#E01E5A"/><path d="M8 14.5a1.5 1.5 0 003 0V9.5a1.5 1.5 0 00-3 0v5z" fill="#E01E5A"/><path d="M9.5 6.5a1.5 1.5 0 010-3 1.5 1.5 0 010 3H9.5z" fill="#36C5F0"/><path d="M9.5 8a1.5 1.5 0 010 3H4.5a1.5 1.5 0 010-3h5z" fill="#36C5F0"/><path d="M17.5 9.5a1.5 1.5 0 013 0 1.5 1.5 0 01-3 0V9.5z" fill="#2EB67D"/><path d="M16 9.5a1.5 1.5 0 00-3 0v5a1.5 1.5 0 003 0v-5z" fill="#2EB67D"/><path d="M14.5 17.5a1.5 1.5 0 010 3 1.5 1.5 0 010-3H14.5z" fill="#ECB22E"/><path d="M14.5 16a1.5 1.5 0 010-3h5a1.5 1.5 0 010 3h-5z" fill="#ECB22E"/>`)
+  },
+  email: {
+    label: '이메일',
+    svg: pfSvg(`<rect x="2" y="4" width="20" height="16" rx="3" stroke="#60a5fa" stroke-width="1.8" fill="none"/><path d="M2 8l10 6 10-6" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round"/>`)
+  },
+  phone: {
+    label: '번호',
+    svg: pfSvg(`<rect x="6" y="2" width="12" height="20" rx="3" stroke="#a78bfa" stroke-width="1.8" fill="none"/><circle cx="12" cy="17" r="1" fill="#a78bfa"/>`)
+  },
+  website: {
+    label: '홈페이지',
+    svg: pfSvg(`<circle cx="12" cy="12" r="10" stroke="#34d399" stroke-width="1.8" fill="none"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20" stroke="#34d399" stroke-width="1.8" fill="none"/>`)
+  },
+  etc: {
+    label: '기타',
+    svg: pfSvg(`<circle cx="12" cy="12" r="1.5" fill="#94a3b8"/><circle cx="6" cy="12" r="1.5" fill="#94a3b8"/><circle cx="18" cy="12" r="1.5" fill="#94a3b8"/>`)
+  },
 };
-// ↑ 플랫폼 아이콘/라벨을 바꾸려면 위 객체의 icon 값을 수정하세요.
-// key(program, naver...) 는 드롭다운 option value 와 일치해야 합니다.
-// 새 플랫폼 추가: { icon:'🆕', label:'새플랫폼' } 형태로 추가 후,
-// index.html의 <select id="pj_platform"> 에도 동일한 value의 <option> 을 추가하세요.
 
 
 const STATUS_STYLES = {
@@ -636,12 +672,12 @@ const STATUS_STYLES = {
 function maskName(name) {
   const n = name.length;
   if(n <= 2) return name;
-  if(n === 3) return name[0] + '●' + name[2];
-  if(n === 4) return name[0] + '●●' + name[3];
+  if(n === 3) return name[0] + '*' + name[2];
+  if(n === 4) return name[0] + '**' + name[3];
   // 5글자 이상: 가운데 1~2자 마스킹
   const mid = Math.floor(n / 2);
   const maskLen = n >= 6 ? 2 : 1;
-  return name.slice(0, mid - Math.floor(maskLen/2)) + '●'.repeat(maskLen) + name.slice(mid - Math.floor(maskLen/2) + maskLen);
+  return name.slice(0, mid - Math.floor(maskLen/2)) + '*'.repeat(maskLen) + name.slice(mid - Math.floor(maskLen/2) + maskLen);
 }
 
 function getProjects() {
@@ -650,29 +686,48 @@ function getProjects() {
 function saveProjects(list) {
   localStorage.setItem('mm_projects', JSON.stringify(list));
 }
-function getTotalOverride() {
-  const v = localStorage.getItem('mm_pj_total_override');
-  return v !== null ? parseInt(v) : null;
+
+// 기준값: 관리자가 직접 설정한 "등록 전 누적 수" (기본 0)
+function getBaseCount() {
+  const v = localStorage.getItem('mm_pj_base');
+  return v !== null ? parseInt(v) : 0;
+}
+function setBaseCount(n) {
+  localStorage.setItem('mm_pj_base', n);
+}
+
+// 전체 = 기준값 + 실제 등록 수
+function calcStats() {
+  const list  = getProjects();
+  const base  = getBaseCount();
+  const total = base + list.length;
+  const done  = list.filter(p => p.status === '완료').length;
+  const ing   = list.filter(p => p.status === '진행 중').length;
+  return { total, done, ing, base, registered: list.length };
 }
 
 function renderProjectList() {
   const tbody = document.getElementById('pjTableBody');
   if(!tbody) return;
-  const list = getProjects();
+  const list   = getProjects();
   const recent = list.slice(0, 10);
-
-  // 통계 업데이트
-  const totalOverride = getTotalOverride();
-  const total = totalOverride !== null ? totalOverride : list.length;
-  const done  = list.filter(p => p.status === '완료').length;
-  const ing   = list.filter(p => p.status === '진행 중').length;
+  const s      = calcStats();
 
   const elTotal = document.getElementById('pjTotalCount');
   const elDone  = document.getElementById('pjDoneCount');
   const elIng   = document.getElementById('pjIngCount');
-  if(elTotal) elTotal.textContent = total;
-  if(elDone)  elDone.textContent  = done;
-  if(elIng)   elIng.textContent   = ing;
+  const elSub   = document.getElementById('pjTotalSub');
+
+  // 편집 중이 아닐 때만 숫자 갱신
+  const inputVisible = document.getElementById('pjTotalInput')?.style.display !== 'none';
+  if(!inputVisible) {
+    if(elTotal) elTotal.textContent = s.total;
+  }
+  if(elDone) elDone.textContent = s.done;
+  if(elIng)  elIng.textContent  = s.ing;
+  if(elSub)  elSub.textContent  = s.base > 0
+    ? `기준 ${s.base} + 등록 ${s.registered}`
+    : `등록 ${s.registered}건`;
 
   if(!recent.length) {
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--text3);">등록된 프로젝트가 없습니다.</td></tr>';
@@ -681,13 +736,13 @@ function renderProjectList() {
 
   tbody.innerHTML = recent.map(p => {
     const pf = PLATFORM_ICONS[p.platform] || PLATFORM_ICONS.etc;
-    const st = STATUS_STYLES[p.status]   || STATUS_STYLES['접수'];
+    const st = STATUS_STYLES[p.status]    || STATUS_STYLES['접수'];
     return `<tr>
-      <td style="font-weight:600;color:var(--text);">${maskName(p.name)}</td>
-      <td style="text-align:center;" title="${pf.label}"><span style="font-size:1.3rem;">${pf.icon}</span></td>
+      <td style="font-weight:600;color:var(--text);white-space:nowrap;">${maskName(p.name)}</td>
+      <td style="text-align:center;" title="${pf.label}">${pf.svg}</td>
       <td style="color:var(--text2);">${p.title}</td>
-      <td style="text-align:center;">
-        <span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border};">${p.status}</span>
+      <td style="text-align:center;white-space:nowrap;">
+        <span style="display:inline-block;min-width:60px;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border};">${p.status}</span>
       </td>
     </tr>`;
   }).join('');
@@ -826,26 +881,139 @@ function loadAdminInquiries() {
   document.getElementById('adminTotal').textContent = list.length;
   document.getElementById('adminNew').textContent = list.filter(i => i.status === 'new').length;
 
-  tbody.innerHTML = list.length ? list.map(item => `
+  tbody.innerHTML = list.length ? list.map(item => {
+    const isNew = item.status === 'new';
+    const badgeStyle = isNew
+      ? 'background:rgba(0,245,200,0.12);color:#00f5c8;border:1px solid rgba(0,245,200,0.3);'
+      : 'background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.25);';
+    return `
     <tr>
-      <td>${item.id}</td>
-      <td><span class="status-badge ${item.status === 'new' ? 'status-new':'status-read'}">${item.status === 'new' ? '신규':'확인'}</span></td>
-      <td><strong>${item.name}</strong></td>
-      <td>${item.phone}</td>
-      <td>${item.email}</td>
-      <td>${item.messenger} / ${item.messId}</td>
-      <td>${item.type}</td>
-      <td>${item.budget}</td>
-      <td>${item.dueDate}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.content}</td>
-      <td>${item.time}</td>
-      <td>${item.ip}</td>
-      <td>
-        <button onclick="markRead(${item.id})" class="btn btn-sm btn-outline" style="font-size:0.7rem;padding:4px 10px;">확인</button>
-        <button onclick="deleteInquiry(${item.id})" class="btn btn-sm" style="font-size:0.7rem;padding:4px 10px;background:#fef2f2;color:#ef4444;margin-left:4px;">삭제</button>
+      <td style="white-space:nowrap;">${item.id}</td>
+      <td style="white-space:nowrap;">
+        <span style="display:inline-block;min-width:44px;text-align:center;padding:3px 8px;border-radius:100px;font-size:0.68rem;font-weight:700;${badgeStyle}">
+          ${isNew ? '신규' : '확인'}
+        </span>
       </td>
-    </tr>`).join('')
+      <td style="white-space:nowrap;"><strong>${item.name}</strong></td>
+      <td style="white-space:nowrap;">${item.phone}</td>
+      <td style="white-space:nowrap;">${item.email}</td>
+      <td style="white-space:nowrap;">${item.messenger} / ${item.messId}</td>
+      <td style="white-space:nowrap;">${item.type}</td>
+      <td style="white-space:nowrap;">${item.budget}</td>
+      <td style="white-space:nowrap;">${item.dueDate}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.content}</td>
+      <td style="white-space:nowrap;">${item.time}</td>
+      <td style="white-space:nowrap;">${item.ip}</td>
+      <td style="white-space:nowrap;">
+        <div style="display:flex;gap:5px;align-items:center;">
+          <button onclick="viewInquiry(${item.id})"
+            style="display:inline-flex;align-items:center;justify-content:center;min-width:58px;height:28px;font-size:0.7rem;font-weight:600;border-radius:7px;background:rgba(0,245,200,0.1);color:var(--aurora-1);border:1px solid rgba(0,245,200,0.25);cursor:pointer;padding:0 10px;">
+            상세보기
+          </button>
+          <button onclick="deleteInquiry(${item.id})"
+            style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:28px;font-size:0.7rem;font-weight:600;border-radius:7px;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);cursor:pointer;padding:0 10px;">
+            삭제
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('')
     : '<tr><td colspan="13" style="text-align:center;padding:40px;color:var(--text3);">문의 내역이 없습니다.</td></tr>';
+}
+
+function viewInquiry(id) {
+  const list = MM_DATA.getInquiries();
+  const item = list.find(i => i.id === id);
+  if(!item) return;
+
+  // 읽음 처리
+  const updated = list.map(i => i.id === id ? {...i, status:'read'} : i);
+  localStorage.setItem('mm_inquiries', JSON.stringify(updated));
+
+  // 상세보기 모달 생성
+  const existing = document.getElementById('inquiryDetailModal');
+  if(existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'inquiryDetailModal';
+  overlay.style.cssText = `
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;padding:20px;`;
+  overlay.onclick = e => { if(e.target === overlay) { overlay.remove(); loadAdminInquiries(); }};
+
+  const isNew = item.status === 'new';
+  overlay.innerHTML = `
+    <div style="
+      background:var(--bg-surface,#1a1f2e);
+      border:1px solid rgba(0,245,200,0.15);
+      border-radius:20px;width:100%;max-width:540px;
+      max-height:88vh;overflow-y:auto;position:relative;
+      box-shadow:0 24px 64px rgba(0,0,0,0.6);
+    ">
+      <!-- 헤더 -->
+      <div style="padding:24px 28px 0;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <span style="font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:100px;
+            ${isNew
+              ? 'background:rgba(0,245,200,0.12);color:#00f5c8;border:1px solid rgba(0,245,200,0.3);'
+              : 'background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.25);'}">
+            ${isNew ? '신규' : '확인'}
+          </span>
+          <span style="font-size:0.75rem;color:var(--text3,#64748b);margin-left:10px;">#${item.id}</span>
+        </div>
+        <button onclick="document.getElementById('inquiryDetailModal').remove();loadAdminInquiries();"
+          style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+          border-radius:8px;width:32px;height:32px;cursor:pointer;color:var(--text3,#94a3b8);font-size:1rem;
+          display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+
+      <!-- 본문 -->
+      <div style="padding:20px 28px 32px;">
+        <h3 style="font-size:1.05rem;font-weight:800;color:var(--text,#e2e8f0);margin:0 0 20px;">
+          📋 문의 상세 내용
+        </h3>
+
+        <!-- 연락처 그룹 -->
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px 18px;margin-bottom:14px;">
+          <div style="font-size:0.68rem;font-weight:700;color:var(--aurora-1,#00f5c8);letter-spacing:1px;margin-bottom:12px;">CONTACT</div>
+          ${detailRow('👤 성함/회사명', item.name)}
+          ${detailRow('📱 연락처', item.phone)}
+          ${detailRow('📧 이메일', item.email)}
+          ${detailRow('💬 메신저', `${item.messenger} · ${item.messId}`)}
+        </div>
+
+        <!-- 문의 그룹 -->
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px 18px;margin-bottom:14px;">
+          <div style="font-size:0.68rem;font-weight:700;color:var(--aurora-2,#7b6fef);letter-spacing:1px;margin-bottom:12px;">INQUIRY</div>
+          ${detailRow('📋 문의 유형', item.type)}
+          ${detailRow('💰 예산 범위', item.budget)}
+          ${detailRow('⏰ 희망 납기', item.dueDate)}
+        </div>
+
+        <!-- 문의 내용 -->
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px 18px;margin-bottom:14px;">
+          <div style="font-size:0.68rem;font-weight:700;color:var(--aurora-3,#ff79c6);letter-spacing:1px;margin-bottom:10px;">CONTENT</div>
+          <p style="font-size:0.88rem;line-height:1.8;color:var(--text2,#94a3b8);margin:0;white-space:pre-wrap;">${item.content || '(내용 없음)'}</p>
+        </div>
+
+        <!-- 메타 -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:0.72rem;color:var(--text3,#64748b);">🕒 ${item.time}</span>
+          <span style="font-size:0.72rem;color:var(--text3,#64748b);">🌐 ${item.ip}</span>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  loadAdminInquiries();
+}
+
+function detailRow(label, value) {
+  return `<div style="display:flex;gap:12px;margin-bottom:8px;align-items:baseline;">
+    <span style="font-size:0.75rem;color:var(--text3,#64748b);white-space:nowrap;min-width:110px;">${label}</span>
+    <span style="font-size:0.85rem;font-weight:600;color:var(--text,#e2e8f0);">${value || '-'}</span>
+  </div>`;
 }
 
 function markRead(id) {
@@ -862,33 +1030,51 @@ function deleteInquiry(id) {
 
 // ── 프로젝트 목록 관리 ──
 function loadAdminProjects() {
-  const list = getProjects();
-  const totalOverride = getTotalOverride();
-  const total = totalOverride !== null ? totalOverride : list.length;
-  const done  = list.filter(p => p.status === '완료').length;
-  const ing   = list.filter(p => p.status === '진행 중').length;
+  const s = calcStats();
 
-  const elTotal = document.getElementById('adminPjTotal');
-  const elDone  = document.getElementById('adminPjDone');
-  const elIng   = document.getElementById('adminPjIng');
-  if(elTotal) elTotal.textContent = total;
-  if(elDone)  elDone.textContent  = done;
-  if(elIng)   elIng.textContent   = ing;
+  // 편집 중이 아닐 때만 숫자 갱신
+  const adminInputVisible = document.getElementById('adminPjTotalInput')?.style.display !== 'none';
+  if(!adminInputVisible) {
+    const elTotal = document.getElementById('adminPjTotal');
+    if(elTotal) elTotal.textContent = s.total;
+  }
+  const elDone = document.getElementById('adminPjDone');
+  const elIng  = document.getElementById('adminPjIng');
+  const elSub  = document.getElementById('adminPjTotalSub');
+  if(elDone) elDone.textContent = s.done;
+  if(elIng)  elIng.textContent  = s.ing;
+  if(elSub)  elSub.textContent  = s.base > 0
+    ? `기준값 ${s.base} + 등록 ${s.registered} = ${s.total}`
+    : `등록된 프로젝트 ${s.registered}건`;
 
+  const list  = getProjects();
   const tbody = document.getElementById('adminPjBody');
   if(!tbody) return;
 
   tbody.innerHTML = list.length ? list.map(p => {
     const pf = PLATFORM_ICONS[p.platform] || PLATFORM_ICONS.etc;
-    const st = STATUS_STYLES[p.status]   || STATUS_STYLES['접수'];
+    const st = STATUS_STYLES[p.status]    || STATUS_STYLES['접수'];
     return `<tr>
-      <td>${p.name}</td>
-      <td style="text-align:center;" title="${pf.label}"><span style="font-size:1.2rem;">${pf.icon}</span> <span style="font-size:0.72rem;color:var(--text3);">${pf.label}</span></td>
-      <td>${p.title}</td>
-      <td style="text-align:center;"><span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border};">${p.status}</span></td>
-      <td>
-        <button onclick="editPjItem(${p.id})" class="btn btn-sm btn-outline" style="font-size:0.7rem;padding:4px 10px;">수정</button>
-        <button onclick="deletePjItem(${p.id})" class="btn btn-sm" style="font-size:0.7rem;padding:4px 10px;background:#fef2f2;color:#ef4444;margin-left:4px;">삭제</button>
+      <td style="white-space:nowrap;font-weight:600;color:var(--text);">${p.name}</td>
+      <td style="text-align:center;white-space:nowrap;" title="${pf.label}">
+        ${pf.svg}
+        <span style="display:block;font-size:0.65rem;color:var(--text3);margin-top:2px;">${pf.label}</span>
+      </td>
+      <td style="color:var(--text2);">${p.title}</td>
+      <td style="text-align:center;white-space:nowrap;">
+        <span style="display:inline-block;min-width:60px;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border};">${p.status}</span>
+      </td>
+      <td style="white-space:nowrap;">
+        <div style="display:flex;gap:5px;align-items:center;">
+          <button onclick="editPjItem(${p.id})"
+            style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:28px;font-size:0.7rem;font-weight:600;border-radius:7px;background:rgba(255,255,255,0.06);color:var(--text2);border:1px solid rgba(255,255,255,0.12);cursor:pointer;padding:0 10px;">
+            수정
+          </button>
+          <button onclick="deletePjItem(${p.id})"
+            style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:28px;font-size:0.7rem;font-weight:600;border-radius:7px;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);cursor:pointer;padding:0 10px;">
+            삭제
+          </button>
+        </div>
       </td>
     </tr>`;
   }).join('')
@@ -952,14 +1138,60 @@ function deletePjItem(id) {
   loadAdminProjects();
 }
 
-function editTotalProjects() {
-  const cur = getTotalOverride() ?? getProjects().length;
-  const val = prompt('누적 프로젝트 수를 입력하세요:', cur);
-  if(val === null) return;
-  const num = parseInt(val);
-  if(isNaN(num) || num < 0) { alert('올바른 숫자를 입력하세요.'); return; }
-  localStorage.setItem('mm_pj_total_override', num);
-  loadAdminProjects();
+// ── 통계 인라인 편집 (메인 + 관리자 공통) ──
+function startEditStat(type) {
+  if(type === 'total') {
+    const cur = getBaseCount();
+    // 메인 영역
+    const numEl   = document.getElementById('pjTotalCount');
+    const inputEl = document.getElementById('pjTotalInput');
+    const valEl   = document.getElementById('pjTotalVal');
+    if(numEl && inputEl && valEl) {
+      numEl.style.display   = 'none';
+      inputEl.style.display = 'block';
+      valEl.value = cur;
+      valEl.focus(); valEl.select();
+    }
+    // 관리자 영역
+    const aDisplay = document.getElementById('adminPjTotalDisplay');
+    const aInput   = document.getElementById('adminPjTotalInput');
+    const aVal     = document.getElementById('adminPjTotalVal');
+    if(aDisplay && aInput && aVal) {
+      aDisplay.style.display = 'none';
+      aInput.style.display   = 'block';
+      aVal.value = cur;
+      aVal.focus(); aVal.select();
+    }
+  }
+}
+
+function saveEditStat(type) {
+  if(type === 'total') {
+    const valEl  = document.getElementById('pjTotalVal');
+    const aValEl = document.getElementById('adminPjTotalVal');
+    const raw = (valEl || aValEl)?.value;
+    const num = parseInt(raw);
+    if(isNaN(num) || num < 0) { alert('0 이상의 숫자를 입력하세요.'); return; }
+    setBaseCount(num);
+    cancelEditStat('total');   // UI 복원
+    renderProjectList();
+    loadAdminProjects();
+  }
+}
+
+function cancelEditStat(type) {
+  if(type === 'total') {
+    // 메인 복원
+    const numEl   = document.getElementById('pjTotalCount');
+    const inputEl = document.getElementById('pjTotalInput');
+    if(numEl)   numEl.style.display   = '';
+    if(inputEl) inputEl.style.display = 'none';
+    // 관리자 복원
+    const aDisplay = document.getElementById('adminPjTotalDisplay');
+    const aInput   = document.getElementById('adminPjTotalInput');
+    if(aDisplay) aDisplay.style.display = '';
+    if(aInput)   aInput.style.display   = 'none';
+  }
 }
 
 // ── Init ──
