@@ -250,6 +250,22 @@
       background-clip:text;
     }
     .pj-stat-lbl { font-size:0.78rem; color:var(--text3); margin-top:4px; }
+    .pj-stat-sub { font-size:0.68rem; color:var(--text3); margin-top:3px; opacity:0.7; }
+
+    /* 편집 가능 카드 */
+    .pj-stat-editable { cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
+    .pj-stat-editable:hover { border-color: rgba(0,245,200,0.35) !important; box-shadow: 0 0 20px rgba(0,245,200,0.1); }
+    .pj-edit-hint { font-size: 0.65rem; opacity: 0.6; }
+    .pj-stat-ok {
+      padding: 2px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer;
+      background: rgba(0,245,200,0.15); color: var(--aurora-1);
+      border: 1px solid rgba(0,245,200,0.3);
+    }
+    .pj-stat-cancel {
+      padding: 2px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer;
+      background: rgba(255,80,80,0.1); color: #ff6b6b;
+      border: 1px solid rgba(255,80,80,0.2);
+    }
     .pj-table-wrap {
       background:var(--bg-glass); border:1px solid rgba(0,245,200,0.1);
       border-radius:16px; overflow:hidden; backdrop-filter:blur(16px);
@@ -270,7 +286,12 @@
     .pj-table tr:last-child td { border-bottom:none; }
     .pj-table tr:hover td { background:rgba(0,245,200,0.02); }
 
-    /* ── 관리자 탭 ── */
+    /* ── 관리자 테이블 정렬 개선 ── */
+    .admin-table th { vertical-align: middle; white-space: nowrap; }
+    .admin-table td { vertical-align: middle; }
+    .admin-table td:last-child { white-space: nowrap; }
+    .pj-table th { vertical-align: middle; white-space: nowrap; }
+    .pj-table td { vertical-align: middle; }
     .admin-tabs {
       display:flex; gap:4px; margin-bottom:24px;
       background:rgba(255,255,255,0.03);
@@ -501,27 +522,47 @@
         <p>지금까지 완료된 프로젝트 현황입니다.</p>
       </div>
       <div class="pj-stats-row">
-        <div class="pj-stat-box">
+
+        <!-- 전체 프로젝트 (기준값 직접 수정 가능) -->
+        <div class="pj-stat-box pj-stat-editable" title="클릭하여 기준 수치 수정" onclick="startEditStat('total')">
           <div class="pj-stat-num" id="pjTotalCount">0</div>
-          <div class="pj-stat-lbl">전체 프로젝트</div>
+          <div id="pjTotalInput" style="display:none;">
+            <input type="number" id="pjTotalVal" min="0"
+              style="width:80px;font-size:1.6rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+              onclick="event.stopPropagation()"
+              onkeydown="if(event.key==='Enter')saveEditStat('total');if(event.key==='Escape')cancelEditStat('total');">
+            <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;" onclick="event.stopPropagation()">
+              <button class="pj-stat-ok"  onclick="saveEditStat('total')">✓</button>
+              <button class="pj-stat-cancel" onclick="cancelEditStat('total')">✕</button>
+            </div>
+          </div>
+          <div class="pj-stat-lbl">전체 프로젝트 <span class="pj-edit-hint">✏️</span></div>
+          <div class="pj-stat-sub" id="pjTotalSub"></div>
         </div>
+
+        <!-- 완료 (자동 집계) -->
         <div class="pj-stat-box">
           <div class="pj-stat-num" id="pjDoneCount">0</div>
           <div class="pj-stat-lbl">완료 프로젝트</div>
+          <div class="pj-stat-sub">자동 집계</div>
         </div>
+
+        <!-- 진행 중 (자동 집계) -->
         <div class="pj-stat-box">
           <div class="pj-stat-num" id="pjIngCount">0</div>
           <div class="pj-stat-lbl">진행 중</div>
+          <div class="pj-stat-sub">자동 집계</div>
         </div>
+
       </div>
       <div class="pj-table-wrap">
         <table class="pj-table">
           <thead>
             <tr>
-              <th style="width:160px;">성함/회사명</th>
-              <th style="width:80px;text-align:center;">플랫폼</th>
+              <th style="width:140px;">성함/회사명</th>
+              <th style="width:72px;text-align:center;">플랫폼</th>
               <th>프로젝트명</th>
-              <th style="width:90px;text-align:center;">진행</th>
+              <th style="width:80px;text-align:center;">진행</th>
             </tr>
           </thead>
           <tbody id="pjTableBody">
@@ -795,9 +836,19 @@
           <table class="admin-table">
             <thead>
               <tr>
-                <th>ID</th><th>상태</th><th>성함/회사명</th><th>연락처</th><th>이메일</th>
-                <th>메신저/ID</th><th>문의 유형</th><th>예산</th><th>납기</th>
-                <th>문의 내용</th><th>접수 시간</th><th>IP</th><th>관리</th>
+                <th style="width:50px;">ID</th>
+                <th style="width:60px;text-align:center;">상태</th>
+                <th style="width:100px;">성함/회사명</th>
+                <th style="width:110px;">연락처</th>
+                <th style="width:160px;">이메일</th>
+                <th style="width:150px;">메신저/ID</th>
+                <th style="width:110px;">문의 유형</th>
+                <th style="width:110px;">예산</th>
+                <th style="width:90px;">납기</th>
+                <th>문의 내용</th>
+                <th style="width:140px;">접수 시간</th>
+                <th style="width:110px;">IP</th>
+                <th style="width:110px;text-align:center;">관리</th>
               </tr>
             </thead>
             <tbody id="adminTableBody"></tbody>
@@ -808,15 +859,34 @@
       <!-- 프로젝트 목록 관리 탭 -->
       <div id="adminTabProjects" style="display:none;">
         <div class="admin-stat-row">
-          <div class="admin-stat">
-            <div style="display:flex;align-items:center;gap:8px;">
+
+          <!-- 누적 전체 (기준값 수정 가능) -->
+          <div class="admin-stat pj-stat-editable" title="클릭하여 기준 수치 수정" onclick="startEditStat('total')">
+            <div id="adminPjTotalDisplay">
               <div class="num" id="adminPjTotal">0</div>
-              <button class="btn btn-sm btn-outline" style="font-size:0.7rem;padding:3px 10px;" onclick="editTotalProjects()">수정</button>
             </div>
-            <div class="lbl">누적 프로젝트 수</div>
+            <div id="adminPjTotalInput" style="display:none;" onclick="event.stopPropagation()">
+              <input type="number" id="adminPjTotalVal" min="0"
+                style="width:70px;font-size:1.4rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+                onkeydown="if(event.key==='Enter')saveEditStat('total');if(event.key==='Escape')cancelEditStat('total');">
+              <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
+                <button class="pj-stat-ok"  onclick="saveEditStat('total')">✓</button>
+                <button class="pj-stat-cancel" onclick="cancelEditStat('total')">✕</button>
+              </div>
+            </div>
+            <div class="lbl">누적 프로젝트 수 ✏️</div>
+            <div style="font-size:0.68rem;color:var(--text3);margin-top:2px;" id="adminPjTotalSub"></div>
           </div>
-          <div class="admin-stat"><div class="num" id="adminPjDone">0</div><div class="lbl">완료</div></div>
-          <div class="admin-stat"><div class="num" id="adminPjIng">0</div><div class="lbl">진행 중</div></div>
+
+          <div class="admin-stat">
+            <div class="num" id="adminPjDone">0</div>
+            <div class="lbl">완료</div>
+          </div>
+          <div class="admin-stat">
+            <div class="num" id="adminPjIng">0</div>
+            <div class="lbl">진행 중</div>
+          </div>
+
         </div>
         <div style="display:flex;gap:8px;margin-bottom:20px;">
           <button class="btn btn-primary btn-sm" onclick="openPjForm()">+ 프로젝트 추가</button>
@@ -872,7 +942,13 @@
         <div class="admin-table-wrap table-scroll">
           <table class="admin-table">
             <thead>
-              <tr><th>성함/회사명</th><th style="text-align:center;">플랫폼</th><th>프로젝트명</th><th style="text-align:center;">진행</th><th>관리</th></tr>
+              <tr>
+                <th style="width:130px;">성함/회사명</th>
+                <th style="width:90px;text-align:center;">플랫폼</th>
+                <th>프로젝트명</th>
+                <th style="width:80px;text-align:center;">진행</th>
+                <th style="width:110px;text-align:center;">관리</th>
+              </tr>
             </thead>
             <tbody id="adminPjBody"></tbody>
           </table>
