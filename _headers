@@ -1,0 +1,7 @@
+# GitHub Pages / Cloudflare Pages 공통 헤더 설정
+
+/js/main.js
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store, no-cache
+  Content-Security-Policy: default-src 'none'
+  X-Content-Type-Options: nosniff

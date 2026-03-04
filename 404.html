@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=/">
+  <title>Redirecting...</title>
+  <script>
+    // /js/ 직접 URL 접근 차단 - 루트로 강제 리다이렉트
+    if (location.pathname.startsWith('/js/')) {
+      location.replace('/');
+    }
+  </script>
+</head>
+<body></body>
+</html>
