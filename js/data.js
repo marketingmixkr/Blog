@@ -13,8 +13,7 @@ const MM_DATA = {
       content: '마케팅믹스 개발자 포트폴리오 사이트를 오픈했습니다.<br>프로그램/마케팅 자동화/챗봇/홈페이지/랜딩페이지/디자인 등, 다양한 포트폴리오와 서비스에 대한 소식을 공유 드릴 예정입니다. 많은 관심 부탁 드립니다.',
       date: '2025-01-01',
       tags: ['공지'],
-      thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80',
-      views: 1
+      thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'
     },
     {
       id: 2,
@@ -24,8 +23,7 @@ const MM_DATA = {
       content: '이번 업데이트로 포트폴리오 페이지에서 카테고리와 태그를 이용해 원하는 프로젝트를 더욱 쉽게 찾을 수 있게 되었습니다. 중복 선택도 가능하니 편하게 이용해 보세요.',
       date: '2025-03-05',
       tags: ['업데이트', '기능'],
-      thumbnail: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=600&q=80',
-      views: 84
+      thumbnail: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=600&q=80'
     },
     {
       id: 3,
@@ -35,8 +33,7 @@ const MM_DATA = {
       content: '이번 프로젝트는 소상공인 고객을 위한 텔레그램 기반 주문 접수 자동화 봇입니다. 주문 접수부터 결제 안내, 배송 알림까지 모두 자동화되어 업무 효율이 크게 향상되었습니다.',
       date: '2025-03-08',
       tags: ['텔레그램', '자동화', '챗봇'],
-      thumbnail: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=600&q=80',
-      views: 213
+      thumbnail: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=600&q=80'
     },
     {
       id: 4,
@@ -46,8 +43,7 @@ const MM_DATA = {
       content: '챗봇을 처음 사용하시는 분들을 위해 기본 명령어 사용법을 정리했습니다. /start로 시작하고, /help로 도움말을 확인하세요. 자세한 내용은 본문을 참고해 주세요.',
       date: '2025-03-10',
       tags: ['가이드', '챗봇'],
-      thumbnail: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=600&q=80',
-      views: 156
+      thumbnail: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=600&q=80'
     },
     {
       id: 5,
@@ -57,8 +53,7 @@ const MM_DATA = {
       content: '1인 마케터분들이 여러 채널의 데이터를 통합해서 볼 수 있는 대시보드를 개발했습니다. 구글 애널리틱스, 네이버 검색광고, 카카오 모먼트 등의 데이터를 한 곳에서 확인할 수 있습니다.',
       date: '2025-03-12',
       tags: ['마케팅', '대시보드', 'API'],
-      thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80',
-      views: 302
+      thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80'
     },
     {
       id: 6,
@@ -68,8 +63,7 @@ const MM_DATA = {
       content: '3개월간 진행한 랜딩페이지 A/B 테스트 결과를 공유합니다. CTA 버튼 색상, 헤드라인 문구, 이미지 배치 등 다양한 요소를 테스트해서 전환율 최적화에 성공했습니다.',
       date: '2025-03-15',
       tags: ['랜딩페이지', '마케팅'],
-      thumbnail: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=600&q=80',
-      views: 187
+      thumbnail: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=600&q=80'
     }
   ],
 
