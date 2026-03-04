@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MarketingMix - 마케팅 자동화, 챗봇 개발, 홈페이지 제작 전문">
+  <title>MarketingMix — 마케팅 자동화 & 개발 포트폴리오</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── 추가 인라인 스타일 ── */
+    .admin-stat-row { display:flex; gap:16px; margin-bottom:24px; }
+    .board-search-wrap { display:flex; gap:12px; align-items:center; margin-bottom:24px; }
+    .board-cat-btns { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+
+    /* 모달 내부 텍스트 색상 보정 */
+    .modal-box .meta-label { color: var(--text3); }
+    .modal-box .meta-value { color: var(--text2); font-weight:600; }
+    .modal-box h2 { color: var(--text); }
+    .modal-box p  { color: var(--text2); }
+
+    /* 섹션 구분 글로우 라인 */
+    .section-glow-line {
+      height: 1px; margin: 0;
+      background: linear-gradient(90deg, transparent 0%, var(--aurora-1) 30%, var(--aurora-2) 50%, var(--aurora-3) 70%, transparent 100%);
+      opacity: 0.2;
+    }
+
+    /* 오로라 섹션 배경 변형 */
+    #portfolio { position: relative; }
+    #portfolio::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(123,111,239,0.06) 0%, transparent 70%);
+    }
+    #contact::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 60% 40% at 20% 60%, rgba(0,245,200,0.05) 0%, transparent 60%);
+    }
+    #contact { position: relative; }
+
+    /* 카드 내부 메타 그리드 */
+    .pf-meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
+    }
+    .pf-meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .pf-meta-item .lbl { font-size: 0.68rem; color: var(--text3); }
+    .pf-meta-item .val { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- ── 오로라 배경 레이어 ── -->
+<div class="aurora-bg" aria-hidden="true">
+  <div class="aurora-layer al1"></div>
+  <div class="aurora-layer al2"></div>
+  <div class="aurora-layer al3"></div>
+  <div class="aurora-layer al4"></div>
+  <div class="aurora-layer al5"></div>
+</div>
+
+<!-- ════════════════════════════════
+     HEADER
+════════════════════════════════ -->
+<header id="header">
+  <div class="container nav-inner">
+    <a class="nav-logo" href="#" onclick="goPage('mainPage');navTo('hero');">
+      <span class="logo-main">MarketingMix</span>
+      <span class="logo-sub">마케팅 자동화 & 개발</span>
+    </a>
+
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#" onclick="goPage('mainPage');navTo('hero');">홈</a></li>
+        <li><a href="#" onclick="goPage('mainPage');navTo('blog');">블로그</a></li>
+        <li><a href="#" onclick="goPage('boardPage');">게시판</a></li>
+        <li><a href="#" onclick="goPage('mainPage');navTo('portfolio');">포트폴리오</a></li>
+        <li><a href="#" onclick="goPage('mainPage');navTo('contact');">문의하기</a></li>
+        <li><a href="#" onclick="goPage('adminPage');" style="color:var(--text3);font-size:0.78rem;">관리자</a></li>
+      </ul>
+    </nav>
+
+    <div class="nav-cta">
+      <button class="btn btn-primary btn-sm" onclick="goPage('mainPage');setTimeout(()=>navTo('contact'),80);">
+        💬 문의하기
+      </button>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="메뉴">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- 모바일 메뉴 -->
+<nav class="mobile-menu" id="mobileMenu">
+  <a href="#" onclick="goPage('mainPage');navTo('hero');">🏠 홈</a>
+  <a href="#" onclick="goPage('mainPage');navTo('blog');">📝 블로그</a>
+  <a href="#" onclick="goPage('boardPage');">📋 게시판</a>
+  <a href="#" onclick="goPage('mainPage');navTo('portfolio');">💼 포트폴리오</a>
+  <a href="#" onclick="goPage('mainPage');navTo('contact');">💬 문의하기</a>
+  <a href="#" onclick="goPage('adminPage');">🔐 관리자</a>
+</nav>
+
+
+<!-- ════════════════════════════════
+     MAIN PAGE
+════════════════════════════════ -->
+<div id="mainPage" class="page active">
+
+  <!-- ── Hero ── -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-inner">
+
+        <!-- 텍스트 -->
+        <div class="hero-text">
+          <div class="hero-badge">
+            <span class="dot"></span>
+            🚀 마케팅 자동화 전문가
+          </div>
+          <h1 class="hero-title">
+            비즈니스를<br>
+            <span class="grad-1">자동화</span>하고<br>
+            <span class="grad-2">성장</span>시킵니다
+          </h1>
+          <p class="hero-desc">
+            챗봇 개발, 마케팅 자동화, 홈페이지·랜딩페이지 제작까지<br>
+            소상공인부터 기업까지 맞춤형 디지털 솔루션을 제공합니다.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="navTo('portfolio')">포트폴리오 보기 →</button>
+            <button class="btn btn-outline" onclick="navTo('contact')">문의하기</button>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-item"><span class="stat-num">30+</span><span class="stat-label">완료 프로젝트</span></div>
+            <div class="stat-item"><span class="stat-num">98%</span><span class="stat-label">고객 만족도</span></div>
+            <div class="stat-item"><span class="stat-num">3년+</span><span class="stat-label">개발 경력</span></div>
+          </div>
+        </div>
+
+        <!-- 플로팅 카드 -->
+        <div class="hero-visual">
+          <div class="hero-card">
+            <div class="glass">
+              <div class="hero-card-header">
+                <div class="hero-avatar">M</div>
+                <div>
+                  <div class="hero-card-title">MarketingMix</div>
+                  <div class="hero-card-sub">마케팅 자동화 & 개발 전문</div>
+                </div>
+              </div>
+              <div class="hero-skill-list">
+                <div class="skill-row">
+                  <span class="skill-name">챗봇 개발</span>
+                  <div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div>
+                  <span class="skill-pct">95%</span>
+                </div>
+                <div class="skill-row">
+                  <span class="skill-name">마케팅 자동화</span>
+                  <div class="skill-bar"><div class="skill-fill v2" style="width:92%"></div></div>
+                  <span class="skill-pct">92%</span>
+                </div>
+                <div class="skill-row">
+                  <span class="skill-name">홈페이지 제작</span>
+                  <div class="skill-bar"><div class="skill-fill v3" style="width:88%"></div></div>
+                  <span class="skill-pct">88%</span>
+                </div>
+                <div class="skill-row">
+                  <span class="skill-name">UI / 디자인</span>
+                  <div class="skill-bar"><div class="skill-fill v4" style="width:82%"></div></div>
+                  <span class="skill-pct">82%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-badge-stack">
+            <div class="badge-pill">✈️ Telegram Bot</div>
+            <div class="badge-pill">⚡ 자동화</div>
+            <div class="badge-pill">🌐 Web Dev</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-glow-line"></div>
+
+  <!-- ── Blog ── -->
+  <section id="blog" class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Blog</span>
+        <h2>블로그 & 소식</h2>
+        <p>마케팅 자동화, 개발 팁, 프로젝트 소식을 공유합니다.</p>
+      </div>
+
+      <div class="blog-tabs">
+        <button class="tab-btn active" data-cat="전체"     onclick="renderBlog('전체')">전체</button>
+        <button class="tab-btn" data-cat="공지사항"        onclick="renderBlog('공지사항')">📢 공지사항</button>
+        <button class="tab-btn" data-cat="업데이트"        onclick="renderBlog('업데이트')">🔄 업데이트</button>
+        <button class="tab-btn" data-cat="새소식"          onclick="renderBlog('새소식')">✨ 새소식</button>
+        <button class="tab-btn" data-cat="사용 가이드"     onclick="renderBlog('사용 가이드')">📖 사용 가이드</button>
+        <button class="tab-btn" data-cat="프로젝트"        onclick="renderBlog('프로젝트')">🛠 프로젝트</button>
+      </div>
+
+      <div class="blog-grid" id="blogGrid"></div>
+
+      <div class="show-more-wrap">
+        <button class="btn btn-outline" onclick="goPage('boardPage')">게시판에서 더 보기 →</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-glow-line"></div>
+
+  <!-- ── Portfolio ── -->
+  <section id="portfolio" class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Portfolio</span>
+        <h2>포트폴리오</h2>
+        <p>카테고리와 태그로 원하는 프로젝트를 찾아보세요. 중복 선택 가능합니다.</p>
+      </div>
+
+      <!-- 검색 -->
+      <div class="search-wrap">
+        <input type="text" id="searchInput" class="search-input" placeholder="프로젝트명, 기술, 태그로 검색...">
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- 카테고리 필터 -->
+      <div class="portfolio-controls">
+        <div class="filter-group">
+          <span class="filter-label">카테고리</span>
+          <button class="filter-btn pf-cat-btn active" data-cat="전체">전체</button>
+          <button class="filter-btn pf-cat-btn" data-cat="개인용">👤 개인용</button>
+          <button class="filter-btn pf-cat-btn" data-cat="업무용">💼 업무용</button>
+          <button class="filter-btn pf-cat-btn" data-cat="소프트웨어">💻 소프트웨어</button>
+          <button class="filter-btn pf-cat-btn" data-cat="챗봇">🤖 챗봇</button>
+          <button class="filter-btn pf-cat-btn" data-cat="디자인">🎨 디자인</button>
+          <button class="filter-btn pf-cat-btn" data-cat="홈페이지">🌐 홈페이지</button>
+          <button class="filter-btn pf-cat-btn" data-cat="랜딩페이지">🚀 랜딩페이지</button>
+          <button class="filter-btn pf-cat-btn" data-cat="기타">📌 기타</button>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">태그</span>
+          <button class="filter-btn pf-tag-btn" data-tag="개인용">👤 개인용</button>
+          <button class="filter-btn pf-tag-btn" data-tag="업무용">💼 업무용</button>
+          <button class="filter-btn pf-tag-btn" data-tag="마케팅">📣 마케팅</button>
+          <button class="filter-btn pf-tag-btn" data-tag="자동화">⚡ 자동화</button>
+          <button class="filter-btn pf-tag-btn" data-tag="SaaS">☁️ SaaS</button>
+          <button class="filter-btn pf-tag-btn" data-tag="Telegram">✈️ Telegram</button>
+          <button class="filter-btn pf-tag-btn" data-tag="Discord">🎮 Discord</button>
+          <button class="filter-btn pf-tag-btn" data-tag="KakaoTalk">💛 KakaoTalk</button>
+          <button class="filter-btn pf-tag-btn" data-tag="결제">💳 결제</button>
+          <button class="filter-btn pf-tag-btn" data-tag="API 연동">🔗 API 연동</button>
+          <button class="filter-btn pf-tag-btn" data-tag="Webhook">🪝 Webhook</button>
+          <button class="filter-btn pf-tag-btn" data-tag="라이선스">🔑 라이선스</button>
+          <button class="filter-btn pf-tag-btn" data-tag="랜딩페이지">🚀 랜딩페이지</button>
+          <button class="filter-btn pf-tag-btn" data-tag="홈페이지">🌐 홈페이지</button>
+          <button class="filter-btn pf-tag-btn" data-tag="디자인">🎨 디자인</button>
+          <button class="filter-btn pf-tag-btn" data-tag="기타">📌 기타</button>
+        </div>
+      </div>
+
+      <div class="portfolio-grid" id="portfolioGrid"></div>
+    </div>
+  </section>
+
+  <div class="section-glow-line"></div>
+
+  <!-- ── Contact ── -->
+  <section id="contact" class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Contact</span>
+        <h2>문의하기</h2>
+        <p>프로젝트 문의는 아래 양식을 작성해 주세요. 빠르게 연락드리겠습니다.</p>
+      </div>
+
+      <div class="contact-grid">
+        <!-- 왼쪽 -->
+        <div class="contact-info">
+          <h3>함께 성장하는<br>파트너가 되겠습니다</h3>
+          <p>챗봇 개발, 마케팅 자동화, 홈페이지 및 랜딩페이지 제작까지 다양한 디지털 솔루션을 제공합니다. 아이디어가 있다면 편하게 연락해 주세요.</p>
+          <div class="contact-detail-list">
+            <div class="contact-detail">
+              <div class="contact-detail-icon">✈️</div>
+              <div><div class="cd-title">Telegram</div><div class="cd-sub">빠른 답변 가능</div></div>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail-icon">⏱</div>
+              <div><div class="cd-title">평균 응답 시간</div><div class="cd-sub">24시간 이내</div></div>
+            </div>
+            <div class="contact-detail">
+              <div class="contact-detail-icon">🌏</div>
+              <div><div class="cd-title">작업 범위</div><div class="cd-sub">원격 작업 가능 · 전국 어디서든</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 오른쪽 폼 -->
+        <div class="form-card">
+          <form id="contactForm">
+            <div class="form-grid">
+
+              <div class="form-group">
+                <label class="form-label">성함 / 회사명 <span class="req">*</span></label>
+                <input name="name" type="text" class="form-control" placeholder="홍길동 / (주)마케팅믹스" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">연락처 <span class="req">*</span></label>
+                <input name="phone" type="tel" class="form-control" placeholder="010-0000-0000" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">이메일 <span class="req">*</span></label>
+                <input name="email" type="email" class="form-control" placeholder="example@email.com" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">선호 메신저 <span class="req">*</span></label>
+                <select name="messenger" class="form-control" required>
+                  <option value="">선택해 주세요</option>
+                  <option>카카오톡</option>
+                  <option>디스코드</option>
+                  <option>텔레그램</option>
+                  <option>기타</option>
+                </select>
+              </div>
+
+              <div class="form-group form-col-full">
+                <label class="form-label">메신저 ID <span class="req">*</span></label>
+                <input name="messenger_id" type="text" class="form-control" placeholder="카카오 오픈채팅 URL, 디스코드 ID, 텔레그램 @username 등" required>
+              </div>
+
+              <div class="form-group form-col-full">
+                <label class="form-label">문의 유형 <span class="req">*</span></label>
+                <select name="inquiry_type" class="form-control" required>
+                  <option value="">선택해 주세요</option>
+                  <option>프로그램 개발</option>
+                  <option>챗봇 개발</option>
+                  <option>홈페이지 제작</option>
+                  <option>랜딩페이지 제작</option>
+                  <option>디자인 외주</option>
+                  <option>기타</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">예산 범위 <span class="opt">(선택)</span></label>
+                <select name="budget" class="form-control">
+                  <option value="">선택 안 함</option>
+                  <option>10 - 30만원</option>
+                  <option>30 - 50만원</option>
+                  <option>50 - 100만원</option>
+                  <option>100 - 300만원</option>
+                  <option>300 - 500만원</option>
+                  <option>500만원 이상</option>
+                  <option>협의 가능</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">희망 납기 <span class="opt">(선택)</span></label>
+                <input name="due_date" id="f_date" type="date" class="form-control">
+              </div>
+
+              <div class="form-group form-col-full">
+                <label class="form-label">문의 내용 <span class="req">*</span></label>
+                <textarea name="content" class="form-control" rows="5"
+                  placeholder="프로젝트 내용을 최대한 자세히 적어주시면 빠르게 답변드릴 수 있어요 😊&#10;&#10;예) 원하시는 기능, 참고 사이트, 현재 사용 중인 도구 등" required></textarea>
+              </div>
+
+            </div>
+
+            <button type="submit" class="submit-btn">📨 문의 접수하기</button>
+          </form>
+
+          <div class="form-success" id="formSuccess">
+            <div class="success-icon">🎉</div>
+            <div class="success-title">접수가 완료되었습니다!</div>
+            <div class="success-desc">빠른 시일 내에 입력하신 연락처로 연락드리겠습니다.<br>텔레그램으로 문의 내용이 발송되었습니다.</div>
+            <button class="btn btn-outline mt-16" onclick="location.reload()">새 문의 작성</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer id="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logo-text">MarketingMix.</div>
+          <p>챗봇 개발, 마케팅 자동화, 홈페이지·랜딩페이지 제작<br>소상공인부터 기업까지 맞춤형 디지털 솔루션을 제공합니다.</p>
+        </div>
+        <div class="footer-col">
+          <h4>메뉴</h4>
+          <ul>
+            <li><a href="#" onclick="navTo('hero')">홈</a></li>
+            <li><a href="#" onclick="navTo('blog')">블로그</a></li>
+            <li><a href="#" onclick="goPage('boardPage')">게시판</a></li>
+            <li><a href="#" onclick="navTo('portfolio')">포트폴리오</a></li>
+            <li><a href="#" onclick="navTo('contact')">문의하기</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>서비스</h4>
+          <ul>
+            <li><a href="#">챗봇 개발</a></li>
+            <li><a href="#">마케팅 자동화</a></li>
+            <li><a href="#">홈페이지 제작</a></li>
+            <li><a href="#">랜딩페이지 제작</a></li>
+            <li><a href="#">디자인 외주</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 MarketingMix. All rights reserved.</p>
+        <p>Powered by MarketingMix</p>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /mainPage -->
+
+
+<!-- ════════════════════════════════
+     BOARD PAGE
+════════════════════════════════ -->
+<div id="boardPage" class="page">
+  <div class="page-hero">
+    <div class="container">
+      <h1>📋 게시판</h1>
+      <p>마케팅믹스의 모든 포스팅을 확인하세요.</p>
+    </div>
+  </div>
+
+  <div class="container section-sm">
+    <div class="board-search-wrap">
+      <div class="search-wrap" style="margin:0;flex:1;max-width:360px;">
+        <input type="text" id="boardSearch" class="search-input" placeholder="제목 검색..." oninput="boardSearchFn()">
+        <span class="search-icon">🔍</span>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="goPage('mainPage')">← 메인으로</button>
+    </div>
+
+    <div class="board-cat-btns">
+      <button class="tab-btn active" onclick="renderBoard('전체');boardCatActive(this)">전체</button>
+      <button class="tab-btn" onclick="renderBoard('공지사항');boardCatActive(this)">📢 공지사항</button>
+      <button class="tab-btn" onclick="renderBoard('업데이트');boardCatActive(this)">🔄 업데이트</button>
+      <button class="tab-btn" onclick="renderBoard('새소식');boardCatActive(this)">✨ 새소식</button>
+      <button class="tab-btn" onclick="renderBoard('사용 가이드');boardCatActive(this)">📖 사용 가이드</button>
+      <button class="tab-btn" onclick="renderBoard('프로젝트');boardCatActive(this)">🛠 프로젝트</button>
+    </div>
+
+    <div class="table-scroll">
+      <table class="board-table">
+        <thead>
+          <tr>
+            <th style="width:50px">번호</th>
+            <th style="width:100px">카테고리</th>
+            <th>제목</th>
+            <th style="width:110px">날짜</th>
+            <th style="width:70px">조회</th>
+          </tr>
+        </thead>
+        <tbody id="boardBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     ADMIN PAGE
+════════════════════════════════ -->
+<div id="adminPage" class="page">
+  <div class="container admin-wrap">
+
+    <div id="adminLogin" class="admin-login">
+      <div style="text-align:center;margin-bottom:36px;">
+        <div style="font-size:2.8rem;margin-bottom:10px;filter:drop-shadow(0 0 20px rgba(0,245,200,0.5));">🔐</div>
+        <h2 style="font-size:1.6rem;font-weight:900;color:var(--text);">관리자 로그인</h2>
+        <p style="color:var(--text3);font-size:0.82rem;margin-top:8px;">이 페이지는 관리자 전용입니다.</p>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">비밀번호</label>
+        <input id="adminPw" type="password" class="form-control" placeholder="관리자 비밀번호를 입력하세요">
+      </div>
+      <p id="adminLoginErr" style="color:#ff6b6b;font-size:0.8rem;min-height:20px;margin-bottom:8px;"></p>
+      <button id="adminLoginBtn" class="submit-btn">로그인</button>
+      <div style="text-align:center;margin-top:16px;">
+        <button class="btn btn-outline btn-sm" onclick="goPage('mainPage')">← 메인으로</button>
+      </div>
+    </div>
+
+    <div id="adminPanel" style="display:none;">
+      <div class="admin-header">
+        <h2 style="font-size:1.6rem;font-weight:900;color:var(--text);">📊 문의 관리</h2>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="loadAdminInquiries()">🔄 새로고침</button>
+          <button class="btn btn-sm" style="background:rgba(255,80,80,0.1);color:#ff6b6b;border:1px solid rgba(255,80,80,0.2);" onclick="if(confirm('전체 삭제하시겠습니까?')){localStorage.removeItem('mm_inquiries');loadAdminInquiries();}">전체 삭제</button>
+          <button class="btn btn-outline btn-sm" onclick="goPage('mainPage')">← 메인</button>
+        </div>
+      </div>
+
+      <div class="admin-stat-row">
+        <div class="admin-stat"><div class="num" id="adminTotal">0</div><div class="lbl">전체 문의</div></div>
+        <div class="admin-stat"><div class="num" id="adminNew" style="">0</div><div class="lbl">신규 문의</div></div>
+      </div>
+      <p class="admin-refresh">💡 30초마다 자동 갱신됩니다.</p>
+
+      <div class="admin-table-wrap table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>상태</th><th>성함/회사명</th><th>연락처</th><th>이메일</th>
+              <th>메신저/ID</th><th>문의 유형</th><th>예산</th><th>납기</th>
+              <th>문의 내용</th><th>접수 시간</th><th>IP</th><th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     MODALS
+════════════════════════════════ -->
+
+<!-- Blog Modal -->
+<div class="modal-overlay" id="blogModal" onclick="if(event.target===this)closeBlogModal()">
+  <div class="modal-box" style="position:relative;">
+    <button class="modal-close" onclick="closeBlogModal()">✕</button>
+    <div class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Portfolio Modal -->
+<div class="modal-overlay" id="pfModal" onclick="if(event.target===this)closePfModal()">
+  <div class="modal-box" style="position:relative;">
+    <button class="modal-close" onclick="closePfModal()">✕</button>
+    <div class="modal-body"></div>
+  </div>
+</div>
+
+
+<!-- ── Scripts ── -->
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+function boardCatActive(el) {
+  document.querySelectorAll('.board-cat-btns .tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+function boardSearchFn() {
+  const q = document.getElementById('boardSearch').value.trim().toLowerCase();
+  const tbody = document.getElementById('boardBody');
+  if(!q){ renderBoard(); return; }
+  const filtered = MM_DATA.posts.filter(p =>
+    p.title.toLowerCase().includes(q) || p.summary.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
+  );
+  tbody.innerHTML = filtered.length
+    ? filtered.map((p,i) => `
+      <tr>
+        <td class="board-num">${filtered.length-i}</td>
+        <td><span style="background:rgba(0,245,200,0.1);color:var(--aurora-1);padding:2px 8px;border-radius:100px;font-size:0.68rem;font-weight:700;border:1px solid rgba(0,245,200,0.2);">${p.category}</span></td>
+        <td><span class="post-title" onclick="openBlogModal(${p.id})">${p.title}</span></td>
+        <td style="color:var(--text3);">${p.date}</td>
+        <td style="color:var(--text3);">${p.views}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3);">"${q}" 검색 결과가 없습니다.</td></tr>`;
+}
+</script>
+
+</body>
+</html>
