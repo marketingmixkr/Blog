@@ -6,11 +6,9 @@
 (function(){
   const _k=0x5A;
   const _b64=atob,_xd=s=>{const r=_b64(s);let o='';for(let i=0;i<r.length;i++)o+=String.fromCharCode(r.charCodeAt(i)^_k);return o;};
-  // 분산 저장: 각 조각을 별도 배열로 보관
   const _s0=['YmxtaWpsamlr','aGAbGx8TLm0N','by8gECoJLT8r','KDwuNzQrFzgd','KzEPNxEoKCwXLQ=='];
   const _s1=['b2lua2po','aGhjag=='];
   const _s2=['NzsoMT8u','MzQ9NzMi','aGpob3s='];
-  // 조각 결합 후 복호화
   Object.defineProperty(window,'_TG_T',{get:()=>_xd(_s0.join('')),enumerable:false,configurable:false});
   Object.defineProperty(window,'_TG_C',{get:()=>_xd(_s1.join('')),enumerable:false,configurable:false});
   Object.defineProperty(window,'_AP', {get:()=>_xd(_s2.join('')),enumerable:false,configurable:false});
@@ -77,8 +75,18 @@ function navTo(id) {
   if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ── Blog ──
+// ══════════════════════════════════
+// BLOG
+// ══════════════════════════════════
 let currentBlogCat = '전체';
+
+const BLOG_CAT_CONFIG = {
+  '공지사항':   { icon: '📢', color: '#ef4444', bg: 'rgba(239,68,68,0.08)' },
+  '업데이트':   { icon: '🔄', color: '#0ea5e9', bg: 'rgba(14,165,233,0.08)' },
+  '새소식':     { icon: '✨', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
+  '사용 가이드':{ icon: '📖', color: '#10b981', bg: 'rgba(16,185,129,0.08)' },
+  '프로젝트':   { icon: '🛠', color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)' },
+};
 
 function renderBlog(cat) {
   currentBlogCat = cat;
@@ -99,11 +107,14 @@ function renderBlog(cat) {
 }
 
 function blogCard(p) {
+  const cfg = BLOG_CAT_CONFIG[p.category] || { icon:'📌', color:'#94a3b8', bg:'rgba(148,163,184,0.08)' };
   return `
   <div class="blog-card" onclick="openBlogModal(${p.id})">
-    <img class="blog-thumb" src="${p.thumbnail}" alt="${p.title}" loading="lazy" onerror="this.style.background='#f1f5f9';this.src='';">
+    <div class="blog-thumb-wrap">
+      <img class="blog-thumb" src="${p.thumbnail}" alt="${p.title}" loading="lazy" onerror="this.style.background='#1e293b';this.src='';">
+      <span class="blog-cat-badge" style="background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.color}30;">${cfg.icon} ${p.category}</span>
+    </div>
     <div class="blog-body">
-      <span class="blog-cat">${p.category}</span>
       <div class="blog-title">${p.title}</div>
       <div class="blog-summary">${p.summary}</div>
       <div class="blog-footer">
@@ -114,26 +125,52 @@ function blogCard(p) {
   </div>`;
 }
 
-// ── Blog Modal ──
+// ── Blog Modal (블로그 포스팅 스타일) ──
 function openBlogModal(id) {
   const post = MM_DATA.posts.find(p => p.id === id);
   if(!post) return;
+  const cfg = BLOG_CAT_CONFIG[post.category] || { icon:'📌', color:'#94a3b8', bg:'rgba(148,163,184,0.08)' };
   const m = document.getElementById('blogModal');
+
+  // 카테고리별 헤더 색상 강조
   m.querySelector('.modal-body').innerHTML = `
-    <img src="${post.thumbnail}" style="width:100%;height:240px;object-fit:cover;border-radius:20px 20px 0 0;" alt="" onerror="this.style.display='none';">
-    <div style="padding:32px;">
-      <span class="blog-cat">${post.category}</span>
-      <h2 style="font-size:1.4rem;font-weight:800;margin:12px 0 10px;color:var(--text);">${post.title}</h2>
-      <div style="display:flex;gap:16px;font-size:0.75rem;color:var(--text3);margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.06);">
-        <span>📅 ${post.date}</span><span>👁 ${post.views}</span>
+    <div class="blog-post-hero" style="background:linear-gradient(160deg,${cfg.bg} 0%,transparent 60%);padding:0;">
+      <img src="${post.thumbnail}" style="width:100%;height:260px;object-fit:cover;border-radius:20px 20px 0 0;display:block;" alt="" onerror="this.style.display='none';">
+    </div>
+    <div class="blog-post-content">
+      <div class="blog-post-meta-row">
+        <span class="blog-post-cat" style="background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.color}30;">${cfg.icon} ${post.category}</span>
+        <span class="blog-post-date">📅 ${post.date}</span>
+        <span class="blog-post-views">👁 ${post.views}</span>
       </div>
-      <p style="line-height:1.9;color:var(--text2);font-size:0.9rem;">${post.content}</p>
+      <h1 class="blog-post-title">${post.title}</h1>
+      <div class="blog-post-divider"></div>
+      <div class="blog-post-body">${formatPostContent(post.content)}</div>
+      ${post.tags && post.tags.length ? `
+      <div class="blog-post-tags">
+        ${post.tags.map(t=>`<span class="blog-tag-chip"># ${t}</span>`).join('')}
+      </div>` : ''}
     </div>`;
+
   m.classList.add('open');
 }
+
+// 포스트 내용 포맷 - 줄바꿈 처리 및 단락 분리
+function formatPostContent(text) {
+  if(!text) return '';
+  // 빈 줄 기준으로 문단 분리
+  const paragraphs = text.split(/\n\n+/);
+  return paragraphs.map(p => {
+    const lines = p.split('\n').join('<br>');
+    return `<p>${lines}</p>`;
+  }).join('');
+}
+
 function closeBlogModal() { document.getElementById('blogModal')?.classList.remove('open'); }
 
-// ── Portfolio ──
+// ══════════════════════════════════
+// PORTFOLIO
+// ══════════════════════════════════
 let pfActiveCats = [];
 let pfActiveTags = [];
 
@@ -145,15 +182,6 @@ function initPortfolio() {
       const v = btn.dataset.cat;
       if(v === '전체') { pfActiveCats = []; pfActiveTags = []; syncPfButtons(); renderPortfolio(); return; }
       toggleArr(pfActiveCats, v);
-      syncPfButtons();
-      renderPortfolio();
-    });
-  });
-
-  document.querySelectorAll('.pf-tag-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const v = btn.dataset.tag;
-      toggleArr(pfActiveTags, v);
       syncPfButtons();
       renderPortfolio();
     });
@@ -171,9 +199,6 @@ function syncPfButtons() {
     b.classList.toggle('active',
       v === '전체' ? pfActiveCats.length === 0 : pfActiveCats.includes(v));
   });
-  document.querySelectorAll('.pf-tag-btn').forEach(b => {
-    b.classList.toggle('active', pfActiveTags.includes(b.dataset.tag));
-  });
 }
 
 function renderPortfolio() {
@@ -182,7 +207,6 @@ function renderPortfolio() {
 
   let items = MM_DATA.portfolio;
   if(pfActiveCats.length) items = items.filter(p => pfActiveCats.some(c => p.categories.includes(c)));
-  if(pfActiveTags.length) items = items.filter(p => pfActiveTags.some(t => (p.tags||[]).includes(t)));
 
   grid.innerHTML = items.length
     ? items.map(p => portfolioCard(p)).join('')
@@ -195,16 +219,15 @@ function portfolioCard(p) {
   const types = (p.purchasable.type||[]).join(' · ') || '';
   const purchBadge = p.purchasable.available
     ? `<span class="purchasable-badge purchasable-y">✅ 구매 가능${types ? ' · '+types : ''}</span>`
-    : `<span class="purchasable-badge purchasable-n">❌ 판매 중단</span>`;
+    : `<span class="purchasable-badge purchasable-n">🚫 판매 불가</span>`;
 
   return `
   <div class="portfolio-card" onclick="openPfModal(${p.id})">
-    <img class="portfolio-thumb" src="${p.thumbnail}" alt="${p.name}" loading="lazy" onerror="this.style.background='#f1f5f9';this.src='';">
+    <img class="portfolio-thumb" src="${p.thumbnail}" alt="${p.name}" loading="lazy" onerror="this.style.background='#1e293b';this.src='';">
     <div class="portfolio-body">
       <div class="portfolio-cats">${p.categories.map(c=>`<span class="cat-badge">${c}</span>`).join('')}</div>
       <div class="portfolio-name">${p.name}</div>
       <div class="portfolio-summary">${p.summary}</div>
-      <div class="portfolio-tags">${(p.tags||[]).map(renderTag).join('')}</div>
       <div class="portfolio-meta">
         <div class="meta-row"><span class="meta-label">💰 금액</span><span class="meta-value">${p.price||'-'}</span></div>
         <div class="meta-row"><span class="meta-label">📅 기간</span><span class="meta-value">${p.period||'-'}</span></div>
@@ -217,22 +240,21 @@ function portfolioCard(p) {
 
 function designCard(p) {
   const custom = p.purchasable.customizable ? '커스텀 가능' : (p.purchasable.negotiable ? '협의' : '커스텀 불가');
-  const avail = p.purchasable.available ? '구매 가능' : '판매 중단';
+  const avail = p.purchasable.available ? '구매 가능' : '판매 불가';
   return `
   <div class="portfolio-card" onclick="openPfModal(${p.id})">
-    <img class="portfolio-thumb" src="${p.thumbnail}" alt="${p.name}" loading="lazy" onerror="this.style.background='#f1f5f9';this.src='';">
+    <img class="portfolio-thumb" src="${p.thumbnail}" alt="${p.name}" loading="lazy" onerror="this.style.background='#1e293b';this.src='';">
     <div class="portfolio-body">
       <div class="portfolio-cats"><span class="cat-badge">디자인</span></div>
       <div class="portfolio-name">${p.name}</div>
       <div class="portfolio-summary">${p.summary}</div>
-      <div class="portfolio-tags">${(p.tags||[]).map(renderTag).join('')}</div>
       <div class="portfolio-meta">
         <div class="meta-row"><span class="meta-label">🎨 유형</span><span class="meta-value">${(p.designType||[]).join(', ')}</span></div>
         <div class="meta-row"><span class="meta-label">🛠 커스텀</span><span class="meta-value">${custom}</span></div>
       </div>
     </div>
     <div class="portfolio-footer">
-      <span class="purchasable-badge ${p.purchasable.available ? 'purchasable-y':'purchasable-n'}">${p.purchasable.available ? '✅':'❌'} ${avail}</span>
+      <span class="purchasable-badge ${p.purchasable.available ? 'purchasable-y':'purchasable-n'}">${p.purchasable.available ? '✅':'🚫'} ${avail}</span>
       <button class="detail-btn">자세히 →</button>
     </div>
   </div>`;
@@ -244,33 +266,40 @@ function openPfModal(id) {
   if(!p) return;
   const m = document.getElementById('pfModal');
   let body = '';
+  const canBuy = p.purchasable.available;
 
   if(p.isDesign) {
     const custom = p.purchasable.customizable ? '✅ 커스텀 가능' : (p.purchasable.negotiable ? '💬 협의' : '❌ 커스텀 불가');
+    const buyBtnHtml = canBuy
+      ? `<button class="btn btn-primary" onclick="closePfModal();openBuyModal(${p.id});" style="width:100%;justify-content:center;">🛒 구매 문의하기</button>`
+      : `<div class="not-available-msg">🚫 구매 불가능한 상품입니다</div>`;
     body = `
       <img src="${p.thumbnail}" style="width:100%;height:240px;object-fit:cover;border-radius:20px 20px 0 0;" onerror="this.style.display='none';">
       <div style="padding:32px;">
         <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;color:var(--text);">${p.name}</h2>
         <p style="color:var(--text2);margin-bottom:24px;font-size:0.88rem;">${p.summary}</p>
         <div class="pf-meta-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;">
-            <div style="font-size:0.68rem;color:var(--text3);margin-bottom:4px;">🎨 디자인 유형</div>
-            <div style="font-size:0.85rem;font-weight:600;color:var(--text);">${(p.designType||[]).join(', ')}</div>
+          <div class="pf-meta-item-box">
+            <div class="pf-meta-item-lbl">🎨 디자인 유형</div>
+            <div class="pf-meta-item-val">${(p.designType||[]).join(', ')}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;">
-            <div style="font-size:0.68rem;color:var(--text3);margin-bottom:4px;">🛒 구매 여부</div>
-            <div style="font-size:0.85rem;font-weight:600;color:var(--text);">${p.purchasable.available ? '✅ 가능' : '❌ 불가'}</div>
+          <div class="pf-meta-item-box">
+            <div class="pf-meta-item-lbl">🛒 구매 여부</div>
+            <div class="pf-meta-item-val">${canBuy ? '✅ 가능' : '🚫 불가'}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;">
-            <div style="font-size:0.68rem;color:var(--text3);margin-bottom:4px;">🛠 커스텀</div>
-            <div style="font-size:0.85rem;font-weight:600;color:var(--text);">${custom}</div>
+          <div class="pf-meta-item-box">
+            <div class="pf-meta-item-lbl">🛠 커스텀</div>
+            <div class="pf-meta-item-val">${custom}</div>
           </div>
         </div>
         <div style="margin-bottom:20px;">${(p.tags||[]).map(renderTag).join('')}</div>
-        <button class="btn btn-primary" onclick="navToContact();closePfModal();" style="width:100%;justify-content:center;">문의하기</button>
+        ${buyBtnHtml}
       </div>`;
   } else {
     const types = (p.purchasable.type||[]).join(' · ');
+    const buyBtnHtml = canBuy
+      ? `<button class="btn btn-primary" onclick="closePfModal();openBuyModal(${p.id});" style="width:100%;justify-content:center;">🛒 구매 문의하기</button>`
+      : `<div class="not-available-msg">🚫 구매 불가능한 상품입니다</div>`;
     body = `
       <img src="${p.thumbnail}" style="width:100%;height:240px;object-fit:cover;border-radius:20px 20px 0 0;" onerror="this.style.display='none';">
       <div style="padding:32px;">
@@ -278,33 +307,33 @@ function openPfModal(id) {
         <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;color:var(--text);">${p.name}</h2>
         <p style="color:var(--text2);margin-bottom:24px;font-size:0.88rem;">${p.summary}</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;">
-            <div style="font-size:0.68rem;color:var(--text3);margin-bottom:4px;">💻 기술 스택</div>
-            <div style="font-size:0.78rem;font-weight:600;color:var(--text);">${(p.techStack||[]).join(', ')}</div>
+          <div class="pf-meta-item-box">
+            <div class="pf-meta-item-lbl">💻 기술 스택</div>
+            <div class="pf-meta-item-val" style="font-size:0.78rem;">${(p.techStack||[]).join(', ')}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;">
-            <div style="font-size:0.68rem;color:var(--text3);margin-bottom:4px;">🏆 핵심 성과</div>
-            <div style="font-size:0.78rem;font-weight:600;color:var(--text);">${p.achievement||'-'}</div>
+          <div class="pf-meta-item-box">
+            <div class="pf-meta-item-lbl">🏆 핵심 성과</div>
+            <div class="pf-meta-item-val" style="font-size:0.78rem;">${p.achievement||'-'}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;">
-            <div style="font-size:0.68rem;color:var(--text3);margin-bottom:4px;">📅 개발 기간</div>
-            <div style="font-size:0.85rem;font-weight:600;color:var(--text);">${p.period||'-'}</div>
+          <div class="pf-meta-item-box">
+            <div class="pf-meta-item-lbl">📅 개발 기간</div>
+            <div class="pf-meta-item-val">${p.period||'-'}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;">
-            <div style="font-size:0.68rem;color:var(--text3);margin-bottom:4px;">💰 금액</div>
-            <div style="font-size:0.85rem;font-weight:600;color:var(--aurora-1);">${p.price||'-'}</div>
+          <div class="pf-meta-item-box">
+            <div class="pf-meta-item-lbl">💰 금액</div>
+            <div class="pf-meta-item-val" style="color:var(--aurora-1);">${p.price||'-'}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;">
-            <div style="font-size:0.68rem;color:var(--text3);margin-bottom:4px;">🛒 구매 가능</div>
-            <div style="font-size:0.85rem;font-weight:600;color:var(--text);">${p.purchasable.available ? `✅ ${types}` : '❌ 불가'}</div>
+          <div class="pf-meta-item-box">
+            <div class="pf-meta-item-lbl">🛒 구매 가능</div>
+            <div class="pf-meta-item-val">${canBuy ? `✅ ${types}` : '🚫 불가'}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;">
-            <div style="font-size:0.68rem;color:var(--text3);margin-bottom:4px;">🎯 고객 타깃</div>
-            <div style="font-size:0.85rem;font-weight:600;color:var(--text);">${(p.target||[]).join(', ')}</div>
+          <div class="pf-meta-item-box">
+            <div class="pf-meta-item-lbl">🎯 고객 타깃</div>
+            <div class="pf-meta-item-val">${(p.target||[]).join(', ')}</div>
           </div>
         </div>
         <div style="margin-bottom:20px;">${(p.tags||[]).map(renderTag).join('')}</div>
-        <button class="btn btn-primary" onclick="navToContact();closePfModal();" style="width:100%;justify-content:center;">이 프로젝트 문의하기</button>
+        ${buyBtnHtml}
       </div>`;
   }
 
@@ -312,7 +341,139 @@ function openPfModal(id) {
   m.classList.add('open');
 }
 function closePfModal() { document.getElementById('pfModal')?.classList.remove('open'); }
-function navToContact() { navTo('contact'); }
+
+// ── 구매 문의 모달 ──
+function openBuyModal(id) {
+  const p = MM_DATA.portfolio.find(x => x.id === id);
+  if(!p) return;
+  const tags = (p.tags||[]);
+  const price = p.price || '-';
+
+  const tagOptions = tags.map(t =>
+    `<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;color:var(--text2);">
+      <input type="checkbox" name="buy_tag" value="${t}" checked style="accent-color:var(--aurora-1);">${t}
+    </label>`
+  ).join('');
+
+  document.getElementById('buyModalBody').innerHTML = `
+    <div style="padding:32px;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">🛒</div>
+        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);">구매 문의</h2>
+        <p style="font-size:0.8rem;color:var(--text3);margin-top:4px;">${p.name}</p>
+      </div>
+      <form id="buyForm">
+        <input type="hidden" id="buy_project_name" value="${p.name}">
+        <input type="hidden" id="buy_project_price" value="${price}">
+        <div class="form-grid" style="gap:14px;">
+          <div class="form-group">
+            <label class="form-label">성함 / 회사명 <span class="req">*</span></label>
+            <input id="buy_name" type="text" class="form-control" placeholder="홍길동 / (주)마케팅믹스" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">연락처 <span class="req">*</span></label>
+            <input id="buy_phone" type="tel" class="form-control" placeholder="010-0000-0000" required>
+          </div>
+          <div class="form-group form-col-full">
+            <label class="form-label">이메일 <span class="req">*</span></label>
+            <input id="buy_email" type="email" class="form-control" placeholder="example@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">메신저 <span class="req">*</span></label>
+            <select id="buy_messenger" class="form-control" required>
+              <option value="">선택해 주세요</option>
+              <option>카카오톡</option>
+              <option>디스코드</option>
+              <option>텔레그램</option>
+              <option>기타</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">메신저 ID <span class="req">*</span></label>
+            <input id="buy_messenger_id" type="text" class="form-control" placeholder="@username 등" required>
+          </div>
+          <div class="form-group form-col-full">
+            <label class="form-label">프로젝트명</label>
+            <input type="text" class="form-control" value="${p.name}" readonly style="opacity:0.6;cursor:not-allowed;">
+          </div>
+          ${tags.length ? `
+          <div class="form-group form-col-full">
+            <label class="form-label">문의 유형 <span class="req">*</span></label>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">
+              ${tagOptions}
+            </div>
+          </div>` : ''}
+          <div class="form-group form-col-full">
+            <label class="form-label">결제 금액</label>
+            <input type="text" class="form-control" value="${price}" readonly style="opacity:0.6;cursor:not-allowed;">
+          </div>
+          <div class="form-group form-col-full">
+            <label class="form-label">문의 내용 <span class="opt">(선택)</span></label>
+            <textarea id="buy_content" class="form-control" rows="3" placeholder="추가 문의사항을 입력해 주세요."></textarea>
+          </div>
+        </div>
+        <button type="button" class="submit-btn" style="margin-top:16px;" onclick="submitBuyForm()">📨 구매 문의 접수</button>
+      </form>
+      <div id="buySuccess" style="display:none;text-align:center;padding:32px 0;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">🎉</div>
+        <div style="font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:8px;">접수 완료!</div>
+        <div style="font-size:0.85rem;color:var(--text3);">빠른 시일 내에 연락드리겠습니다.</div>
+        <button class="btn btn-outline" style="margin-top:20px;" onclick="closeBuyModal()">닫기</button>
+      </div>
+    </div>`;
+
+  document.getElementById('buyModal').classList.add('open');
+}
+
+async function submitBuyForm() {
+  const name       = document.getElementById('buy_name').value.trim();
+  const phone      = document.getElementById('buy_phone').value.trim();
+  const email      = document.getElementById('buy_email').value.trim();
+  const messenger  = document.getElementById('buy_messenger').value;
+  const messId     = document.getElementById('buy_messenger_id').value.trim();
+  const projectName= document.getElementById('buy_project_name').value;
+  const price      = document.getElementById('buy_project_price').value;
+  const content    = document.getElementById('buy_content').value.trim();
+
+  if(!name||!phone||!email||!messenger||!messId) {
+    alert('필수 항목을 모두 입력해 주세요.');
+    return;
+  }
+
+  // 체크된 태그 수집
+  const checkedTags = [...document.querySelectorAll('input[name="buy_tag"]:checked')].map(el=>el.value);
+  const tagStr = checkedTags.length ? checkedTags.join(', ') : '-';
+
+  const btn = document.querySelector('#buyForm .submit-btn');
+  if(btn) { btn.disabled=true; btn.textContent='전송 중...'; }
+
+  const kstNow = nowKST();
+  const tgMsg =
+`[ Github - MarketingMix. ]
+구매 문의 드립니다.
+
+👤 성함/회사명 : ${name}
+📱 연락처 : ${phone}
+📧 이메일 : ${email}
+💬 메신저 : ${messenger} / 메신저 ID : ${messId}
+
+📌 프로젝트명 : ${projectName}
+📋 문의 유형 : ${tagStr}
+💰 구매 금액 : ${price}
+
+💬 문의 내용 :
+${content || '(없음)'}
+
+🕒 문의 시간 : ${kstNow} (UTC+9 기준)
+🌐 IP 주소 : ${userIP}`;
+
+  await sendTelegram(tgMsg);
+
+  document.getElementById('buyForm').style.display = 'none';
+  document.getElementById('buySuccess').style.display = 'block';
+}
+
+function closeBuyModal() { document.getElementById('buyModal')?.classList.remove('open'); }
 
 // ── Search ──
 function initSearch() {
@@ -334,7 +495,94 @@ function initSearch() {
   });
 }
 
-// ── Contact Form ──
+// ══════════════════════════════════
+// PROJECT LIST
+// ══════════════════════════════════
+const PLATFORM_ICONS = {
+  program:   { icon:'💻', label:'프로그램' },
+  naver:     { icon:'🟢', label:'네이버' },
+  google:    { icon:'🔵', label:'구글' },
+  instagram: { icon:'📸', label:'인스타그램' },
+  facebook:  { icon:'👤', label:'페이스북' },
+  discord:   { icon:'🎮', label:'디스코드' },
+  slack:     { icon:'💬', label:'슬랙' },
+  email:     { icon:'📧', label:'이메일' },
+  phone:     { icon:'📱', label:'번호' },
+  website:   { icon:'🌐', label:'홈페이지' },
+  etc:       { icon:'📌', label:'기타' },
+};
+
+const STATUS_STYLES = {
+  '접수':   { color:'#64748b', bg:'rgba(100,116,139,0.12)', border:'rgba(100,116,139,0.3)' },
+  '대기 중':{ color:'#f59e0b', bg:'rgba(245,158,11,0.1)',   border:'rgba(245,158,11,0.3)' },
+  '진행 중':{ color:'#0ea5e9', bg:'rgba(14,165,233,0.1)',   border:'rgba(14,165,233,0.3)' },
+  '보류 중':{ color:'#ef4444', bg:'rgba(239,68,68,0.1)',    border:'rgba(239,68,68,0.3)' },
+  '완료':   { color:'#10b981', bg:'rgba(16,185,129,0.1)',   border:'rgba(16,185,129,0.3)' },
+};
+
+function maskName(name) {
+  const n = name.length;
+  if(n <= 2) return name;
+  if(n === 3) return name[0] + '●' + name[2];
+  if(n === 4) return name[0] + '●●' + name[3];
+  // 5글자 이상: 가운데 1~2자 마스킹
+  const mid = Math.floor(n / 2);
+  const maskLen = n >= 6 ? 2 : 1;
+  return name.slice(0, mid - Math.floor(maskLen/2)) + '●'.repeat(maskLen) + name.slice(mid - Math.floor(maskLen/2) + maskLen);
+}
+
+function getProjects() {
+  try { return JSON.parse(localStorage.getItem('mm_projects') || '[]'); } catch { return []; }
+}
+function saveProjects(list) {
+  localStorage.setItem('mm_projects', JSON.stringify(list));
+}
+function getTotalOverride() {
+  const v = localStorage.getItem('mm_pj_total_override');
+  return v !== null ? parseInt(v) : null;
+}
+
+function renderProjectList() {
+  const tbody = document.getElementById('pjTableBody');
+  if(!tbody) return;
+  const list = getProjects();
+  const recent = list.slice(0, 10);
+
+  // 통계 업데이트
+  const totalOverride = getTotalOverride();
+  const total = totalOverride !== null ? totalOverride : list.length;
+  const done  = list.filter(p => p.status === '완료').length;
+  const ing   = list.filter(p => p.status === '진행 중').length;
+
+  const elTotal = document.getElementById('pjTotalCount');
+  const elDone  = document.getElementById('pjDoneCount');
+  const elIng   = document.getElementById('pjIngCount');
+  if(elTotal) elTotal.textContent = total;
+  if(elDone)  elDone.textContent  = done;
+  if(elIng)   elIng.textContent   = ing;
+
+  if(!recent.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--text3);">등록된 프로젝트가 없습니다.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = recent.map(p => {
+    const pf = PLATFORM_ICONS[p.platform] || PLATFORM_ICONS.etc;
+    const st = STATUS_STYLES[p.status]   || STATUS_STYLES['접수'];
+    return `<tr>
+      <td style="font-weight:600;color:var(--text);">${maskName(p.name)}</td>
+      <td style="text-align:center;" title="${pf.label}"><span style="font-size:1.3rem;">${pf.icon}</span></td>
+      <td style="color:var(--text2);">${p.title}</td>
+      <td style="text-align:center;">
+        <span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border};">${p.status}</span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════
+// CONTACT FORM
+// ══════════════════════════════════
 function initContactForm() {
   const form = document.getElementById('contactForm');
   if(!form) return;
@@ -418,8 +666,18 @@ function renderBoard(cat) {
     </tr>`).join('');
 }
 
-// ── Admin ──
+// ══════════════════════════════════
+// ADMIN
+// ══════════════════════════════════
 let _adminOk = false;
+
+function switchAdminTab(tab, el) {
+  document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('adminTabInquiry').style.display  = tab==='inquiry'  ? 'block' : 'none';
+  document.getElementById('adminTabProjects').style.display = tab==='projects' ? 'block' : 'none';
+  if(tab === 'projects') loadAdminProjects();
+}
 
 function initAdmin() {
   const loginBtn = document.getElementById('adminLoginBtn');
@@ -484,6 +742,108 @@ function deleteInquiry(id) {
   loadAdminInquiries();
 }
 
+// ── 프로젝트 목록 관리 ──
+function loadAdminProjects() {
+  const list = getProjects();
+  const totalOverride = getTotalOverride();
+  const total = totalOverride !== null ? totalOverride : list.length;
+  const done  = list.filter(p => p.status === '완료').length;
+  const ing   = list.filter(p => p.status === '진행 중').length;
+
+  const elTotal = document.getElementById('adminPjTotal');
+  const elDone  = document.getElementById('adminPjDone');
+  const elIng   = document.getElementById('adminPjIng');
+  if(elTotal) elTotal.textContent = total;
+  if(elDone)  elDone.textContent  = done;
+  if(elIng)   elIng.textContent   = ing;
+
+  const tbody = document.getElementById('adminPjBody');
+  if(!tbody) return;
+
+  tbody.innerHTML = list.length ? list.map(p => {
+    const pf = PLATFORM_ICONS[p.platform] || PLATFORM_ICONS.etc;
+    const st = STATUS_STYLES[p.status]   || STATUS_STYLES['접수'];
+    return `<tr>
+      <td>${p.name}</td>
+      <td style="text-align:center;" title="${pf.label}"><span style="font-size:1.2rem;">${pf.icon}</span> <span style="font-size:0.72rem;color:var(--text3);">${pf.label}</span></td>
+      <td>${p.title}</td>
+      <td style="text-align:center;"><span style="display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;background:${st.bg};color:${st.color};border:1px solid ${st.border};">${p.status}</span></td>
+      <td>
+        <button onclick="editPjItem(${p.id})" class="btn btn-sm btn-outline" style="font-size:0.7rem;padding:4px 10px;">수정</button>
+        <button onclick="deletePjItem(${p.id})" class="btn btn-sm" style="font-size:0.7rem;padding:4px 10px;background:#fef2f2;color:#ef4444;margin-left:4px;">삭제</button>
+      </td>
+    </tr>`;
+  }).join('')
+  : '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text3);">등록된 프로젝트가 없습니다.</td></tr>';
+
+  // 메인 목록도 동기화
+  renderProjectList();
+}
+
+function openPjForm() {
+  document.getElementById('pjFormTitle').textContent = '프로젝트 추가';
+  document.getElementById('pjEditId').value = '';
+  document.getElementById('pj_name').value = '';
+  document.getElementById('pj_platform').value = 'program';
+  document.getElementById('pj_title').value = '';
+  document.getElementById('pj_status').value = '접수';
+  document.getElementById('pjForm').style.display = 'block';
+}
+
+function closePjForm() {
+  document.getElementById('pjForm').style.display = 'none';
+}
+
+function editPjItem(id) {
+  const list = getProjects();
+  const p = list.find(x => x.id === id);
+  if(!p) return;
+  document.getElementById('pjFormTitle').textContent = '프로젝트 수정';
+  document.getElementById('pjEditId').value     = id;
+  document.getElementById('pj_name').value      = p.name;
+  document.getElementById('pj_platform').value  = p.platform;
+  document.getElementById('pj_title').value     = p.title;
+  document.getElementById('pj_status').value    = p.status;
+  document.getElementById('pjForm').style.display = 'block';
+  document.getElementById('pjForm').scrollIntoView({ behavior:'smooth' });
+}
+
+function savePjItem() {
+  const name     = document.getElementById('pj_name').value.trim();
+  const platform = document.getElementById('pj_platform').value;
+  const title    = document.getElementById('pj_title').value.trim();
+  const status   = document.getElementById('pj_status').value;
+  const editId   = document.getElementById('pjEditId').value;
+
+  if(!name||!title) { alert('성함과 프로젝트명은 필수입니다.'); return; }
+
+  let list = getProjects();
+  if(editId) {
+    list = list.map(p => p.id === parseInt(editId) ? {...p, name, platform, title, status} : p);
+  } else {
+    list.unshift({ id: Date.now(), name, platform, title, status });
+  }
+  saveProjects(list);
+  closePjForm();
+  loadAdminProjects();
+}
+
+function deletePjItem(id) {
+  if(!confirm('삭제하시겠습니까?')) return;
+  saveProjects(getProjects().filter(p => p.id !== id));
+  loadAdminProjects();
+}
+
+function editTotalProjects() {
+  const cur = getTotalOverride() ?? getProjects().length;
+  const val = prompt('누적 프로젝트 수를 입력하세요:', cur);
+  if(val === null) return;
+  const num = parseInt(val);
+  if(isNaN(num) || num < 0) { alert('올바른 숫자를 입력하세요.'); return; }
+  localStorage.setItem('mm_pj_total_override', num);
+  loadAdminProjects();
+}
+
 // ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
@@ -492,6 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSearch();
   initContactForm();
   renderBoard();
+  renderProjectList();
   initAdmin();
 
   document.querySelectorAll('.modal-overlay').forEach(m => {
