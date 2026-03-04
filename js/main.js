@@ -692,13 +692,9 @@ function renderInquiryList() {
   const recent = list.slice(0, 10);
   const s      = calcInqStats();
 
-  // 통계
+  // 통계 뱃지 업데이트
   const elTotal = document.getElementById('inqTotalCount');
-  const elSub   = document.getElementById('inqTotalSub');
   if(elTotal) elTotal.textContent = s.total;
-  if(elSub)   elSub.textContent   = s.base > 0
-    ? `기준 ${s.base} + 등록 ${s.registered}`
-    : `등록 ${s.registered}건`;
 
   if(!recent.length) {
     tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:32px;color:var(--text3);">등록된 문의가 없습니다.</td></tr>';
@@ -790,21 +786,13 @@ function renderProjectList() {
   const recent = list.slice(0, 10);
   const s      = calcStats();
 
-  // 편집 중이 아닌 요소만 업데이트
-  const els = {
-    total: document.getElementById('pjTotalCount'),
-    done:  document.getElementById('pjDoneCount'),
-    ing:   document.getElementById('pjIngCount'),
-    totalSub: document.getElementById('pjTotalSub'),
-    doneSub:  document.getElementById('pjDoneSub'),
-    ingSub:   document.getElementById('pjIngSub'),
-  };
-  if(els.total && document.getElementById('pjTotalInput')?.style.display === 'none') els.total.textContent = s.total;
-  if(els.done  && document.getElementById('pjDoneInput')?.style.display  === 'none') els.done.textContent  = s.done;
-  if(els.ing   && document.getElementById('pjIngInput')?.style.display   === 'none') els.ing.textContent   = s.ing;
-  if(els.totalSub) els.totalSub.textContent = s.base > 0     ? `기준 ${s.base} + 등록 ${s.registered}`   : `등록 ${s.registered}건`;
-  if(els.doneSub)  els.doneSub.textContent  = s.baseDone > 0 ? `기준 ${s.baseDone} + 등록 ${s.regDone}` : `등록 ${s.regDone}건`;
-  if(els.ingSub)   els.ingSub.textContent   = s.baseIng > 0  ? `기준 ${s.baseIng} + 등록 ${s.regIng}`   : `등록 ${s.regIng}건`;
+  // 메인 통계 숫자 업데이트 (읽기 전용 — input 없음)
+  const elTotal = document.getElementById('pjTotalCount');
+  const elDone  = document.getElementById('pjDoneCount');
+  const elIng   = document.getElementById('pjIngCount');
+  if(elTotal) elTotal.textContent = s.total;
+  if(elDone)  elDone.textContent  = s.done;
+  if(elIng)   elIng.textContent   = s.ing;
 
   if(!recent.length) {
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--text3);">등록된 프로젝트가 없습니다.</td></tr>';
@@ -1254,88 +1242,70 @@ function switchListTab(tab, el) {
 }
 
 
-const EDIT_STAT_CONFIG = {
+// ══════════════════════════════════════════════════════════
+// 통계 기준값 편집 — 관리자 페이지 전용
+// ══════════════════════════════════════════════════════════
+
+// type별 설정 (관리자 DOM ID만 관리)
+const STAT_CFG = {
   total: {
-    getBase: getBaseCount, setBase: setBaseCount,
-    mainNum: 'pjTotalCount', mainInput: 'pjTotalInput', mainVal: 'pjTotalVal',
-    adminDisplay: 'adminPjTotalDisplay', adminInput: 'adminPjTotalInput', adminVal: 'adminPjTotalVal',
+    getter: getBaseCount, setter: setBaseCount,
+    dispId: 'adminPjTotalDisplay', inpId: 'adminPjTotalInput', valId: 'adminPjTotalVal',
+    numId: 'adminPjTotal',
   },
   done: {
-    getBase: getBaseDone, setBase: setBaseDone,
-    mainNum: 'pjDoneCount', mainInput: 'pjDoneInput', mainVal: 'pjDoneVal',
-    adminDisplay: 'adminPjDoneDisplay', adminInput: 'adminPjDoneInput', adminVal: 'adminPjDoneVal',
+    getter: getBaseDone, setter: setBaseDone,
+    dispId: 'adminPjDoneDisplay', inpId: 'adminPjDoneInput', valId: 'adminPjDoneVal',
+    numId: 'adminPjDone',
   },
   ing: {
-    getBase: getBaseIng, setBase: setBaseIng,
-    mainNum: 'pjIngCount', mainInput: 'pjIngInput', mainVal: 'pjIngVal',
-    adminDisplay: 'adminPjIngDisplay', adminInput: 'adminPjIngInput', adminVal: 'adminPjIngVal',
+    getter: getBaseIng, setter: setBaseIng,
+    dispId: 'adminPjIngDisplay', inpId: 'adminPjIngInput', valId: 'adminPjIngVal',
+    numId: 'adminPjIng',
   },
   inq: {
-    getBase: getBaseInq, setBase: setBaseInq,
-    mainNum: 'inqTotalCount', mainInput: 'inqTotalInput', mainVal: 'inqTotalVal',
-    adminDisplay: 'adminInqTotalDisplay', adminInput: 'adminInqTotalInput', adminVal: 'adminInqTotalVal',
+    getter: getBaseInq, setter: setBaseInq,
+    dispId: 'adminInqTotalDisplay', inpId: 'adminInqTotalInput', valId: 'adminInqTotalVal',
+    numId: 'adminInqTotal',
   },
 };
 
 function startEditStat(type) {
-  const cfg = EDIT_STAT_CONFIG[type]; if(!cfg) return;
-  const cur = cfg.getBase();
-  // 메인
-  const numEl   = document.getElementById(cfg.mainNum);
-  const inputEl = document.getElementById(cfg.mainInput);
-  const valEl   = document.getElementById(cfg.mainVal);
-  if(numEl && inputEl && valEl) {
-    numEl.style.display = 'none'; inputEl.style.display = 'block';
-    valEl.value = cur; setTimeout(() => { valEl.focus(); valEl.select(); }, 50);
-  }
-  // 관리자
-  const aDisplay = document.getElementById(cfg.adminDisplay);
-  const aInput   = document.getElementById(cfg.adminInput);
-  const aVal     = document.getElementById(cfg.adminVal);
-  if(aDisplay && aInput && aVal) {
-    aDisplay.style.display = 'none'; aInput.style.display = 'block';
-    aVal.value = cur; setTimeout(() => { aVal.focus(); aVal.select(); }, 50);
-  }
+  const c = STAT_CFG[type]; if(!c) return;
+  const disp = document.getElementById(c.dispId);
+  const inp  = document.getElementById(c.inpId);
+  const val  = document.getElementById(c.valId);
+  if(!disp || !inp || !val) { console.warn('startEditStat: element not found', type); return; }
+  disp.style.display = 'none';
+  inp.style.display  = 'block';
+  val.value = c.getter();
+  setTimeout(() => { val.focus(); val.select(); }, 30);
 }
 
 function saveEditStat(type) {
-  const cfg = EDIT_STAT_CONFIG[type]; if(!cfg) return;
-
-  // 현재 화면에서 보이는 input의 값을 읽음 (admin 우선, 없으면 main)
-  const aInputEl = document.getElementById(cfg.adminInput);
-  const mInputEl = document.getElementById(cfg.mainInput);
-  const aValEl   = document.getElementById(cfg.adminVal);
-  const mValEl   = document.getElementById(cfg.mainVal);
-
-  let raw = '';
-  if(aInputEl && aInputEl.style.display !== 'none' && aValEl) {
-    raw = aValEl.value;
-  } else if(mInputEl && mInputEl.style.display !== 'none' && mValEl) {
-    raw = mValEl.value;
-  } else if(aValEl) {
-    raw = aValEl.value;
-  } else if(mValEl) {
-    raw = mValEl.value;
-  }
-
-  const num = parseInt(raw);
+  const c = STAT_CFG[type]; if(!c) return;
+  const val = document.getElementById(c.valId);
+  if(!val) return;
+  const num = parseInt(val.value, 10);
   if(isNaN(num) || num < 0) { alert('0 이상의 숫자를 입력하세요.'); return; }
-
-  cfg.setBase(num);           // 먼저 저장
-  cancelEditStat(type);       // UI 복원
-  refreshAllStats();          // 저장 후 한번에 갱신
+  c.setter(num);
+  cancelEditStat(type);
+  refreshAllStats();
 }
 
 function cancelEditStat(type) {
-  const cfg = EDIT_STAT_CONFIG[type]; if(!cfg) return;
-  const numEl   = document.getElementById(cfg.mainNum);
-  const inputEl = document.getElementById(cfg.mainInput);
-  if(numEl)   numEl.style.display   = '';
-  if(inputEl) inputEl.style.display = 'none';
-  const aDisplay = document.getElementById(cfg.adminDisplay);
-  const aInput   = document.getElementById(cfg.adminInput);
-  if(aDisplay) aDisplay.style.display = '';
-  if(aInput)   aInput.style.display   = 'none';
+  const c = STAT_CFG[type]; if(!c) return;
+  const disp = document.getElementById(c.dispId);
+  const inp  = document.getElementById(c.inpId);
+  if(disp) disp.style.display = '';
+  if(inp)  inp.style.display  = 'none';
+}
+
+function refreshAllStats() {
+  renderProjectList();
+  renderInquiryList();
+  loadAdminProjects();
+  loadAdminInqStats();
 }
 
 // ── Init ──
