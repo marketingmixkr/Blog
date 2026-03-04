@@ -648,7 +648,7 @@ const PLATFORM_ICONS = {
   },
   slack: {
     label: '슬랙',
-    svg: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;"><g><!-- 빨강(상단좌) --><rect x="2" y="6.5" width="5.5" height="2.2" rx="1.1" fill="#E01E5A"/><rect x="2" y="4" width="2.2" height="5" rx="1.1" fill="#E01E5A"/><circle cx="3.1" cy="3.1" r="1.8" fill="#E01E5A"/><!-- 노랑(하단우) --><rect x="12.5" y="11.3" width="5.5" height="2.2" rx="1.1" fill="#ECB22E"/><rect x="15.8" y="11" width="2.2" height="5" rx="1.1" fill="#ECB22E"/><circle cx="16.9" cy="16.9" r="1.8" fill="#ECB22E"/><!-- 초록(상단우) --><rect x="11.3" y="2" width="2.2" height="5" rx="1.1" fill="#2EB67D"/><rect x="11" y="2" width="5" height="2.2" rx="1.1" fill="#2EB67D"/><circle cx="16.9" cy="3.1" r="1.8" fill="#2EB67D"/><!-- 파랑(하단좌) --><rect x="6.5" y="11.3" width="2.2" height="6.7" rx="1.1" fill="#36C5F0"/><rect x="2" y="11.3" width="5" height="2.2" rx="1.1" fill="#36C5F0"/><circle cx="3.1" cy="16.9" r="1.8" fill="#36C5F0"/></g></svg>`
+    svg: `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;"><path d="M7.077 11.408a1.542 1.542 0 01-1.54 1.542 1.542 1.542 0 01-1.542-1.542 1.542 1.542 0 011.541-1.541H7.077v1.541zm.772 0a1.542 1.542 0 011.542-1.541 1.542 1.542 0 011.541 1.541v3.857a1.542 1.542 0 01-1.541 1.542 1.542 1.542 0 01-1.542-1.542v-3.857z" fill="#E01E5A"/><path d="M8.591 7.077a1.542 1.542 0 01-1.541-1.54 1.542 1.542 0 011.541-1.542 1.542 1.542 0 011.542 1.541V7.077H8.59zm0 .772a1.542 1.542 0 011.542 1.542 1.542 1.542 0 01-1.542 1.541H4.735a1.542 1.542 0 01-1.542-1.541 1.542 1.542 0 011.542-1.542h3.856z" fill="#36C5F0"/><path d="M12.923 8.591a1.542 1.542 0 011.541-1.541 1.542 1.542 0 011.542 1.541 1.542 1.542 0 01-1.542 1.542h-1.541V8.59zm-.772 0a1.542 1.542 0 01-1.542 1.542 1.542 1.542 0 01-1.541-1.542V4.735a1.542 1.542 0 011.541-1.542 1.542 1.542 0 011.542 1.542V8.59z" fill="#2EB67D"/><path d="M11.409 12.923a1.542 1.542 0 011.541 1.541 1.542 1.542 0 01-1.541 1.542 1.542 1.542 0 01-1.542-1.542v-1.541h1.542zm0-.772a1.542 1.542 0 01-1.542-1.542 1.542 1.542 0 011.542-1.541h3.856a1.542 1.542 0 011.542 1.541 1.542 1.542 0 01-1.542 1.542h-3.856z" fill="#ECB22E"/></svg>`
   },
   email: {
     label: '이메일',
@@ -790,24 +790,21 @@ function renderProjectList() {
   const recent = list.slice(0, 10);
   const s      = calcStats();
 
-  const elTotal = document.getElementById('pjTotalCount');
-  const elDone  = document.getElementById('pjDoneCount');
-  const elIng   = document.getElementById('pjIngCount');
-  const elSub   = document.getElementById('pjTotalSub');
-  const elDoneSub = document.getElementById('pjDoneSub');
-  const elIngSub  = document.getElementById('pjIngSub');
-
-  // 편집 중이 아닐 때만 숫자 갱신
-  const inputVisible = document.getElementById('pjTotalInput')?.style.display !== 'none';
-  if(!inputVisible) { if(elTotal) elTotal.textContent = s.total; }
-  const doneInputVisible = document.getElementById('pjDoneInput')?.style.display !== 'none';
-  if(!doneInputVisible) { if(elDone) elDone.textContent = s.done; }
-  const ingInputVisible = document.getElementById('pjIngInput')?.style.display !== 'none';
-  if(!ingInputVisible) { if(elIng) elIng.textContent = s.ing; }
-
-  if(elSub)     elSub.textContent     = s.base > 0     ? `기준 ${s.base} + 등록 ${s.registered}`   : `등록 ${s.registered}건`;
-  if(elDoneSub) elDoneSub.textContent = s.baseDone > 0 ? `기준 ${s.baseDone} + 등록 ${s.regDone}` : `등록 ${s.regDone}건`;
-  if(elIngSub)  elIngSub.textContent  = s.baseIng > 0  ? `기준 ${s.baseIng} + 등록 ${s.regIng}`   : `등록 ${s.regIng}건`;
+  // 편집 중이 아닌 요소만 업데이트
+  const els = {
+    total: document.getElementById('pjTotalCount'),
+    done:  document.getElementById('pjDoneCount'),
+    ing:   document.getElementById('pjIngCount'),
+    totalSub: document.getElementById('pjTotalSub'),
+    doneSub:  document.getElementById('pjDoneSub'),
+    ingSub:   document.getElementById('pjIngSub'),
+  };
+  if(els.total && document.getElementById('pjTotalInput')?.style.display === 'none') els.total.textContent = s.total;
+  if(els.done  && document.getElementById('pjDoneInput')?.style.display  === 'none') els.done.textContent  = s.done;
+  if(els.ing   && document.getElementById('pjIngInput')?.style.display   === 'none') els.ing.textContent   = s.ing;
+  if(els.totalSub) els.totalSub.textContent = s.base > 0     ? `기준 ${s.base} + 등록 ${s.registered}`   : `등록 ${s.registered}건`;
+  if(els.doneSub)  els.doneSub.textContent  = s.baseDone > 0 ? `기준 ${s.baseDone} + 등록 ${s.regDone}` : `등록 ${s.regDone}건`;
+  if(els.ingSub)   els.ingSub.textContent   = s.baseIng > 0  ? `기준 ${s.baseIng} + 등록 ${s.regIng}`   : `등록 ${s.regIng}건`;
 
   if(!recent.length) {
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--text3);">등록된 프로젝트가 없습니다.</td></tr>';
@@ -957,11 +954,18 @@ function loadAdminInqStats() {
   const iq = calcInqStats();
   const elTotal = document.getElementById('adminInqTotal');
   const elSub   = document.getElementById('adminInqTotalSub');
-  const adminInputVisible = document.getElementById('adminInqTotalInput')?.style.display !== 'none';
-  if(!adminInputVisible && elTotal) elTotal.textContent = iq.total;
+  if(elTotal && document.getElementById('adminInqTotalInput')?.style.display === 'none') elTotal.textContent = iq.total;
   if(elSub) elSub.textContent = iq.base > 0
     ? `기준 ${iq.base} + 등록 ${iq.registered}`
     : `등록 ${iq.registered}건`;
+}
+
+// 저장 후 모든 통계 한번에 갱신 (cancelEditStat 이후 호출)
+function refreshAllStats() {
+  renderProjectList();
+  renderInquiryList();
+  loadAdminProjects();
+  loadAdminInqStats();
 }
 
 function loadAdminInquiries() {
@@ -1124,22 +1128,15 @@ function deleteInquiry(id) {
 function loadAdminProjects() {
   const s = calcStats();
 
-  // 편집 중이 아닐 때만 숫자 갱신
-  const adminTotalInputVisible = document.getElementById('adminPjTotalInput')?.style.display !== 'none';
-  if(!adminTotalInputVisible) {
-    const elTotal = document.getElementById('adminPjTotal');
-    if(elTotal) elTotal.textContent = s.total;
-  }
-  const adminDoneInputVisible = document.getElementById('adminPjDoneInput')?.style.display !== 'none';
-  if(!adminDoneInputVisible) {
-    const elDone = document.getElementById('adminPjDone');
-    if(elDone) elDone.textContent = s.done;
-  }
-  const adminIngInputVisible = document.getElementById('adminPjIngInput')?.style.display !== 'none';
-  if(!adminIngInputVisible) {
-    const elIng = document.getElementById('adminPjIng');
-    if(elIng) elIng.textContent = s.ing;
-  }
+  // 편집 중 아닌 것만 업데이트
+  const els = {
+    total: document.getElementById('adminPjTotal'),
+    done:  document.getElementById('adminPjDone'),
+    ing:   document.getElementById('adminPjIng'),
+  };
+  if(els.total && document.getElementById('adminPjTotalInput')?.style.display === 'none') els.total.textContent = s.total;
+  if(els.done  && document.getElementById('adminPjDoneInput')?.style.display  === 'none') els.done.textContent  = s.done;
+  if(els.ing   && document.getElementById('adminPjIngInput')?.style.display   === 'none') els.ing.textContent   = s.ing;
 
   const elSubTotal = document.getElementById('adminPjTotalSub');
   const elSubDone  = document.getElementById('adminPjDoneSub');
@@ -1303,17 +1300,30 @@ function startEditStat(type) {
 
 function saveEditStat(type) {
   const cfg = EDIT_STAT_CONFIG[type]; if(!cfg) return;
-  const valEl  = document.getElementById(cfg.mainVal);
-  const aValEl = document.getElementById(cfg.adminVal);
-  const raw = (valEl?.value ?? aValEl?.value);
+
+  // 현재 화면에서 보이는 input의 값을 읽음 (admin 우선, 없으면 main)
+  const aInputEl = document.getElementById(cfg.adminInput);
+  const mInputEl = document.getElementById(cfg.mainInput);
+  const aValEl   = document.getElementById(cfg.adminVal);
+  const mValEl   = document.getElementById(cfg.mainVal);
+
+  let raw = '';
+  if(aInputEl && aInputEl.style.display !== 'none' && aValEl) {
+    raw = aValEl.value;
+  } else if(mInputEl && mInputEl.style.display !== 'none' && mValEl) {
+    raw = mValEl.value;
+  } else if(aValEl) {
+    raw = aValEl.value;
+  } else if(mValEl) {
+    raw = mValEl.value;
+  }
+
   const num = parseInt(raw);
   if(isNaN(num) || num < 0) { alert('0 이상의 숫자를 입력하세요.'); return; }
-  cfg.setBase(num);
-  cancelEditStat(type);
-  renderProjectList();
-  renderInquiryList();
-  loadAdminProjects();
-  loadAdminInqStats();
+
+  cfg.setBase(num);           // 먼저 저장
+  cancelEditStat(type);       // UI 복원
+  refreshAllStats();          // 저장 후 한번에 갱신
 }
 
 function cancelEditStat(type) {
