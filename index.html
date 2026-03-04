@@ -292,6 +292,25 @@
     .admin-table td:last-child { white-space: nowrap; }
     .pj-table th { vertical-align: middle; white-space: nowrap; }
     .pj-table td { vertical-align: middle; }
+
+    /* ── 문의/프로젝트 목록 탭 ── */
+    .pj-list-tabs {
+      display: flex; gap: 4px; margin-bottom: 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 4px; width: fit-content;
+    }
+    .pj-list-tab {
+      padding: 9px 22px; border-radius: 9px; font-size: 0.85rem;
+      font-weight: 600; background: transparent; color: var(--text3);
+      border: none; cursor: pointer; transition: all 0.2s;
+    }
+    .pj-list-tab.active {
+      background: rgba(0,245,200,0.12); color: var(--aurora-1);
+      border: 1px solid rgba(0,245,200,0.2);
+    }
+    .pj-list-tab:hover:not(.active) { color: var(--text2); background: rgba(255,255,255,0.04); }
+
     .admin-tabs {
       display:flex; gap:4px; margin-bottom:24px;
       background:rgba(255,255,255,0.03);
@@ -519,57 +538,124 @@
       <div class="section-head">
         <span class="eyebrow">Project List</span>
         <h2>프로젝트 목록</h2>
-        <p>지금까지 완료된 프로젝트 현황입니다.</p>
+        <p>지금까지 진행된 문의 및 프로젝트 현황입니다.</p>
       </div>
-      <div class="pj-stats-row">
 
-        <!-- 전체 프로젝트 (기준값 직접 수정 가능) -->
-        <div class="pj-stat-box pj-stat-editable" title="클릭하여 기준 수치 수정" onclick="startEditStat('total')">
-          <div class="pj-stat-num" id="pjTotalCount">0</div>
-          <div id="pjTotalInput" style="display:none;">
-            <input type="number" id="pjTotalVal" min="0"
-              style="width:80px;font-size:1.6rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
-              onclick="event.stopPropagation()"
-              onkeydown="if(event.key==='Enter')saveEditStat('total');if(event.key==='Escape')cancelEditStat('total');">
-            <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;" onclick="event.stopPropagation()">
-              <button class="pj-stat-ok"  onclick="saveEditStat('total')">✓</button>
-              <button class="pj-stat-cancel" onclick="cancelEditStat('total')">✕</button>
+      <!-- 탭 -->
+      <div class="pj-list-tabs">
+        <button class="pj-list-tab active" onclick="switchListTab('inquiry', this)">💬 문의 목록</button>
+        <button class="pj-list-tab" onclick="switchListTab('project', this)">📋 프로젝트 목록</button>
+      </div>
+
+      <!-- ── 문의 목록 탭 ── -->
+      <div id="listTabInquiry">
+        <!-- 통계 -->
+        <div class="pj-stats-row" style="margin-bottom:20px;">
+          <div class="pj-stat-box pj-stat-editable" title="클릭하여 기준 수치 수정" onclick="startEditStat('inq')">
+            <div class="pj-stat-num" id="inqTotalCount">0</div>
+            <div id="inqTotalInput" style="display:none;">
+              <input type="number" id="inqTotalVal" min="0"
+                style="width:80px;font-size:1.6rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+                onclick="event.stopPropagation()"
+                onkeydown="if(event.key==='Enter')saveEditStat('inq');if(event.key==='Escape')cancelEditStat('inq');">
+              <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;" onclick="event.stopPropagation()">
+                <button class="pj-stat-ok"  onclick="saveEditStat('inq')">✓</button>
+                <button class="pj-stat-cancel" onclick="cancelEditStat('inq')">✕</button>
+              </div>
             </div>
+            <div class="pj-stat-lbl">전체 문의 <span class="pj-edit-hint">✏️</span></div>
+            <div class="pj-stat-sub" id="inqTotalSub"></div>
           </div>
-          <div class="pj-stat-lbl">전체 프로젝트 <span class="pj-edit-hint">✏️</span></div>
-          <div class="pj-stat-sub" id="pjTotalSub"></div>
         </div>
-
-        <!-- 완료 (자동 집계) -->
-        <div class="pj-stat-box">
-          <div class="pj-stat-num" id="pjDoneCount">0</div>
-          <div class="pj-stat-lbl">완료 프로젝트</div>
-          <div class="pj-stat-sub">자동 집계</div>
+        <!-- 테이블 -->
+        <div class="pj-table-wrap">
+          <table class="pj-table">
+            <thead>
+              <tr>
+                <th style="width:140px;">성함/회사명</th>
+                <th>문의 유형</th>
+                <th style="width:100px;text-align:center;">상태</th>
+              </tr>
+            </thead>
+            <tbody id="inqTableBody">
+              <tr><td colspan="3" style="text-align:center;padding:32px;color:var(--text3);">등록된 문의가 없습니다.</td></tr>
+            </tbody>
+          </table>
         </div>
-
-        <!-- 진행 중 (자동 집계) -->
-        <div class="pj-stat-box">
-          <div class="pj-stat-num" id="pjIngCount">0</div>
-          <div class="pj-stat-lbl">진행 중</div>
-          <div class="pj-stat-sub">자동 집계</div>
-        </div>
-
       </div>
-      <div class="pj-table-wrap">
-        <table class="pj-table">
-          <thead>
-            <tr>
-              <th style="width:140px;">성함/회사명</th>
-              <th style="width:72px;text-align:center;">플랫폼</th>
-              <th>프로젝트명</th>
-              <th style="width:80px;text-align:center;">진행</th>
-            </tr>
-          </thead>
-          <tbody id="pjTableBody">
-            <tr><td colspan="4" style="text-align:center;padding:32px;color:var(--text3);">등록된 프로젝트가 없습니다.</td></tr>
-          </tbody>
-        </table>
+
+      <!-- ── 프로젝트 목록 탭 ── -->
+      <div id="listTabProject" style="display:none;">
+        <!-- 통계 (전체/완료/진행중 모두 편집 가능) -->
+        <div class="pj-stats-row" style="margin-bottom:20px;">
+
+          <div class="pj-stat-box pj-stat-editable" title="클릭하여 기준 수치 수정" onclick="startEditStat('total')">
+            <div class="pj-stat-num" id="pjTotalCount">0</div>
+            <div id="pjTotalInput" style="display:none;">
+              <input type="number" id="pjTotalVal" min="0"
+                style="width:80px;font-size:1.6rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+                onclick="event.stopPropagation()"
+                onkeydown="if(event.key==='Enter')saveEditStat('total');if(event.key==='Escape')cancelEditStat('total');">
+              <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;" onclick="event.stopPropagation()">
+                <button class="pj-stat-ok"  onclick="saveEditStat('total')">✓</button>
+                <button class="pj-stat-cancel" onclick="cancelEditStat('total')">✕</button>
+              </div>
+            </div>
+            <div class="pj-stat-lbl">전체 프로젝트 <span class="pj-edit-hint">✏️</span></div>
+            <div class="pj-stat-sub" id="pjTotalSub"></div>
+          </div>
+
+          <div class="pj-stat-box pj-stat-editable" title="클릭하여 기준 수치 수정" onclick="startEditStat('done')">
+            <div class="pj-stat-num" id="pjDoneCount">0</div>
+            <div id="pjDoneInput" style="display:none;">
+              <input type="number" id="pjDoneVal" min="0"
+                style="width:80px;font-size:1.6rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+                onclick="event.stopPropagation()"
+                onkeydown="if(event.key==='Enter')saveEditStat('done');if(event.key==='Escape')cancelEditStat('done');">
+              <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;" onclick="event.stopPropagation()">
+                <button class="pj-stat-ok"  onclick="saveEditStat('done')">✓</button>
+                <button class="pj-stat-cancel" onclick="cancelEditStat('done')">✕</button>
+              </div>
+            </div>
+            <div class="pj-stat-lbl">완료 프로젝트 <span class="pj-edit-hint">✏️</span></div>
+            <div class="pj-stat-sub" id="pjDoneSub"></div>
+          </div>
+
+          <div class="pj-stat-box pj-stat-editable" title="클릭하여 기준 수치 수정" onclick="startEditStat('ing')">
+            <div class="pj-stat-num" id="pjIngCount">0</div>
+            <div id="pjIngInput" style="display:none;">
+              <input type="number" id="pjIngVal" min="0"
+                style="width:80px;font-size:1.6rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+                onclick="event.stopPropagation()"
+                onkeydown="if(event.key==='Enter')saveEditStat('ing');if(event.key==='Escape')cancelEditStat('ing');">
+              <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;" onclick="event.stopPropagation()">
+                <button class="pj-stat-ok"  onclick="saveEditStat('ing')">✓</button>
+                <button class="pj-stat-cancel" onclick="cancelEditStat('ing')">✕</button>
+              </div>
+            </div>
+            <div class="pj-stat-lbl">진행 중 <span class="pj-edit-hint">✏️</span></div>
+            <div class="pj-stat-sub" id="pjIngSub"></div>
+          </div>
+
+        </div>
+        <!-- 테이블 -->
+        <div class="pj-table-wrap">
+          <table class="pj-table">
+            <thead>
+              <tr>
+                <th style="width:140px;">성함/회사명</th>
+                <th style="width:72px;text-align:center;">플랫폼</th>
+                <th>프로젝트명</th>
+                <th style="width:80px;text-align:center;">진행</th>
+              </tr>
+            </thead>
+            <tbody id="pjTableBody">
+              <tr><td colspan="4" style="text-align:center;padding:32px;color:var(--text3);">등록된 프로젝트가 없습니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
     </div>
   </section>
 
@@ -858,35 +944,79 @@
 
       <!-- 프로젝트 목록 관리 탭 -->
       <div id="adminTabProjects" style="display:none;">
-        <div class="admin-stat-row">
 
-          <!-- 누적 전체 (기준값 수정 가능) -->
-          <div class="admin-stat pj-stat-editable" title="클릭하여 기준 수치 수정" onclick="startEditStat('total')">
-            <div id="adminPjTotalDisplay">
-              <div class="num" id="adminPjTotal">0</div>
-            </div>
-            <div id="adminPjTotalInput" style="display:none;" onclick="event.stopPropagation()">
-              <input type="number" id="adminPjTotalVal" min="0"
-                style="width:70px;font-size:1.4rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
-                onkeydown="if(event.key==='Enter')saveEditStat('total');if(event.key==='Escape')cancelEditStat('total');">
-              <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
-                <button class="pj-stat-ok"  onclick="saveEditStat('total')">✓</button>
-                <button class="pj-stat-cancel" onclick="cancelEditStat('total')">✕</button>
+        <!-- 문의 기준값 -->
+        <div style="background:rgba(0,245,200,0.04);border:1px solid rgba(0,245,200,0.12);border-radius:14px;padding:16px 20px;margin-bottom:20px;">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--aurora-1);letter-spacing:1px;margin-bottom:12px;">💬 문의 통계 기준값</div>
+          <div class="admin-stat-row" style="margin-bottom:0;">
+            <div class="admin-stat pj-stat-editable" title="클릭하여 기준 수치 수정" onclick="startEditStat('inq')" style="min-width:160px;">
+              <div id="adminInqTotalDisplay"><div class="num" id="adminInqTotal">0</div></div>
+              <div id="adminInqTotalInput" style="display:none;" onclick="event.stopPropagation()">
+                <input type="number" id="adminInqTotalVal" min="0"
+                  style="width:70px;font-size:1.4rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+                  onkeydown="if(event.key==='Enter')saveEditStat('inq');if(event.key==='Escape')cancelEditStat('inq');">
+                <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
+                  <button class="pj-stat-ok"  onclick="saveEditStat('inq')">✓</button>
+                  <button class="pj-stat-cancel" onclick="cancelEditStat('inq')">✕</button>
+                </div>
               </div>
+              <div class="lbl">전체 문의 ✏️</div>
+              <div style="font-size:0.68rem;color:var(--text3);margin-top:2px;" id="adminInqTotalSub"></div>
             </div>
-            <div class="lbl">누적 프로젝트 수 ✏️</div>
-            <div style="font-size:0.68rem;color:var(--text3);margin-top:2px;" id="adminPjTotalSub"></div>
           </div>
+        </div>
 
-          <div class="admin-stat">
-            <div class="num" id="adminPjDone">0</div>
-            <div class="lbl">완료</div>
-          </div>
-          <div class="admin-stat">
-            <div class="num" id="adminPjIng">0</div>
-            <div class="lbl">진행 중</div>
-          </div>
+        <!-- 프로젝트 통계 (전체/완료/진행중 모두 편집 가능) -->
+        <div style="background:rgba(123,111,239,0.04);border:1px solid rgba(123,111,239,0.12);border-radius:14px;padding:16px 20px;margin-bottom:20px;">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--aurora-2);letter-spacing:1px;margin-bottom:12px;">📋 프로젝트 통계 기준값</div>
+          <div class="admin-stat-row" style="margin-bottom:0;flex-wrap:wrap;gap:12px;">
 
+            <div class="admin-stat pj-stat-editable" title="클릭" onclick="startEditStat('total')" style="min-width:140px;">
+              <div id="adminPjTotalDisplay"><div class="num" id="adminPjTotal">0</div></div>
+              <div id="adminPjTotalInput" style="display:none;" onclick="event.stopPropagation()">
+                <input type="number" id="adminPjTotalVal" min="0"
+                  style="width:70px;font-size:1.4rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+                  onkeydown="if(event.key==='Enter')saveEditStat('total');if(event.key==='Escape')cancelEditStat('total');">
+                <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
+                  <button class="pj-stat-ok"  onclick="saveEditStat('total')">✓</button>
+                  <button class="pj-stat-cancel" onclick="cancelEditStat('total')">✕</button>
+                </div>
+              </div>
+              <div class="lbl">전체 프로젝트 ✏️</div>
+              <div style="font-size:0.68rem;color:var(--text3);margin-top:2px;" id="adminPjTotalSub"></div>
+            </div>
+
+            <div class="admin-stat pj-stat-editable" title="클릭" onclick="startEditStat('done')" style="min-width:140px;">
+              <div id="adminPjDoneDisplay"><div class="num" id="adminPjDone">0</div></div>
+              <div id="adminPjDoneInput" style="display:none;" onclick="event.stopPropagation()">
+                <input type="number" id="adminPjDoneVal" min="0"
+                  style="width:70px;font-size:1.4rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+                  onkeydown="if(event.key==='Enter')saveEditStat('done');if(event.key==='Escape')cancelEditStat('done');">
+                <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
+                  <button class="pj-stat-ok"  onclick="saveEditStat('done')">✓</button>
+                  <button class="pj-stat-cancel" onclick="cancelEditStat('done')">✕</button>
+                </div>
+              </div>
+              <div class="lbl">완료 ✏️</div>
+              <div style="font-size:0.68rem;color:var(--text3);margin-top:2px;" id="adminPjDoneSub"></div>
+            </div>
+
+            <div class="admin-stat pj-stat-editable" title="클릭" onclick="startEditStat('ing')" style="min-width:140px;">
+              <div id="adminPjIngDisplay"><div class="num" id="adminPjIng">0</div></div>
+              <div id="adminPjIngInput" style="display:none;" onclick="event.stopPropagation()">
+                <input type="number" id="adminPjIngVal" min="0"
+                  style="width:70px;font-size:1.4rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid var(--aurora-1);color:var(--aurora-1);outline:none;"
+                  onkeydown="if(event.key==='Enter')saveEditStat('ing');if(event.key==='Escape')cancelEditStat('ing');">
+                <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
+                  <button class="pj-stat-ok"  onclick="saveEditStat('ing')">✓</button>
+                  <button class="pj-stat-cancel" onclick="cancelEditStat('ing')">✕</button>
+                </div>
+              </div>
+              <div class="lbl">진행 중 ✏️</div>
+              <div style="font-size:0.68rem;color:var(--text3);margin-top:2px;" id="adminPjIngSub"></div>
+            </div>
+
+          </div>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:20px;">
           <button class="btn btn-primary btn-sm" onclick="openPjForm()">+ 프로젝트 추가</button>
@@ -910,6 +1040,8 @@
                 <option value="google">🔵 구글</option>
                 <option value="instagram">📸 인스타그램</option>
                 <option value="facebook">👤 페이스북</option>
+                <option value="kakao">💛 카카오톡</option>
+                <option value="telegram">✈️ 텔레그램</option>
                 <option value="discord">🎮 디스코드</option>
                 <option value="slack">💬 슬랙</option>
                 <option value="email">📧 이메일</option>
