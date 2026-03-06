@@ -688,7 +688,7 @@ function renderInquiryList() {
   const tbody = document.getElementById('inqTableBody');
   if(!tbody) return;
 
-  const list   = MM_DATA.getInquiries();
+  const list   = (() => { try { return JSON.parse(localStorage.getItem('mm_inquiries') || '[]'); } catch { return []; } })();
   const recent = list.slice(0, 10);
   const s      = calcInqStats();
 
@@ -724,42 +724,22 @@ function maskName(name) {
   return name.slice(0, mid - Math.floor(maskLen/2)) + '*'.repeat(maskLen) + name.slice(mid - Math.floor(maskLen/2) + maskLen);
 }
 
-function getProjects() {
-  try { return JSON.parse(localStorage.getItem('mm_projects') || '[]'); } catch { return []; }
-}
-function saveProjects(list) {
-  localStorage.setItem('mm_projects', JSON.stringify(list));
-}
+async function getProjects() { return await DB.getProjects(); }
+async function saveProjects(list) { await DB.saveProjects(list); }
 
-// 기준값: 관리자가 직접 설정한 "등록 전 누적 수" (기본 0)
-function getBaseCount() {
-  const v = localStorage.getItem('mm_pj_base');
-  return v !== null ? parseInt(v) : 0;
-}
-function setBaseCount(n) { localStorage.setItem('mm_pj_base', n); }
-
-function getBaseDone() {
-  const v = localStorage.getItem('mm_pj_base_done');
-  return v !== null ? parseInt(v) : 0;
-}
-function setBaseDone(n) { localStorage.setItem('mm_pj_base_done', n); }
-
-function getBaseIng() {
-  const v = localStorage.getItem('mm_pj_base_ing');
-  return v !== null ? parseInt(v) : 0;
-}
-function setBaseIng(n) { localStorage.setItem('mm_pj_base_ing', n); }
-
-// 문의 기준값
-function getBaseInq() {
-  const v = localStorage.getItem('mm_inq_base');
-  return v !== null ? parseInt(v) : 0;
-}
-function setBaseInq(n) { localStorage.setItem('mm_inq_base', n); }
+// 기준값 — DB 레이어에 위임
+function  getBaseCount() { return DB.getBaseCount(); }
+function  getBaseDone()  { return DB.getBaseDone(); }
+function  getBaseIng()   { return DB.getBaseIng(); }
+function  getBaseInq()   { return DB.getBaseInq(); }
+async function setBaseCount(n) { await DB.setBaseCount(n); }
+async function setBaseDone(n)  { await DB.setBaseDone(n); }
+async function setBaseIng(n)   { await DB.setBaseIng(n); }
+async function setBaseInq(n)   { await DB.setBaseInq(n); }
 
 // 전체 = 기준값 + 실제 등록 수
 function calcStats() {
-  const list     = getProjects();
+  const list     = (() => { try { return JSON.parse(localStorage.getItem('mm_projects') || '[]'); } catch { return []; } })();
   const base     = getBaseCount();
   const baseDone = getBaseDone();
   const baseIng  = getBaseIng();
@@ -773,7 +753,7 @@ function calcStats() {
 
 // 문의 통계
 function calcInqStats() {
-  const list   = MM_DATA.getInquiries();
+  const list   = (() => { try { return JSON.parse(localStorage.getItem('mm_inquiries') || '[]'); } catch { return []; } })();
   const base   = getBaseInq();
   const total  = base + list.length;
   return { total, base, registered: list.length };
@@ -782,7 +762,7 @@ function calcInqStats() {
 function renderProjectList() {
   const tbody = document.getElementById('pjTableBody');
   if(!tbody) return;
-  const list   = getProjects();
+  const list   = (() => { try { return JSON.parse(localStorage.getItem('mm_projects') || '[]'); } catch { return []; } })();
   const recent = list.slice(0, 10);
   const s      = calcStats();
 
@@ -870,7 +850,7 @@ ${content}
       time: kstNow, ip: userIP,
       status: 'new'
     };
-    MM_DATA.saveInquiry(record);
+    await DB.saveInquiry(record);
 
     form.style.display = 'none';
     document.getElementById('formSuccess').classList.add('show');
@@ -965,8 +945,8 @@ function refreshAllStats() {
   loadAdminInqStats();
 }
 
-function loadAdminInquiries() {
-  const list = MM_DATA.getInquiries();
+async function loadAdminInquiries() {
+  const list = await DB.getInquiries();
   const tbody = document.getElementById('adminTableBody');
   if(!tbody) return;
 
@@ -1020,15 +1000,15 @@ function loadAdminInquiries() {
     : '<tr><td colspan="13" style="text-align:center;padding:40px;color:var(--text3);">문의 내역이 없습니다.</td></tr>';
 }
 
-function viewInquiry(id) {
-  const list = MM_DATA.getInquiries();
+async function viewInquiry(id) {
+  const list = await DB.getInquiries();
   const item = list.find(i => i.id === id);
   if(!item) return;
 
   // 신규면 읽음으로 처리
   if(item.status === 'new') {
     const updated = list.map(i => i.id === id ? {...i, status:'read'} : i);
-    localStorage.setItem('mm_inquiries', JSON.stringify(updated));
+    await DB.updateInquiries(updated);
     item.status = 'read';
   }
 
@@ -1096,28 +1076,25 @@ function detailRow(label, value) {
   </div>`;
 }
 
-function setInqDone(id) {
-  const list = MM_DATA.getInquiries().map(i => i.id === id ? {...i, status:'done'} : i);
-  localStorage.setItem('mm_inquiries', JSON.stringify(list));
-  loadAdminInquiries();
-  renderInquiryList();
+async function setInqDone(id) {
+  const list = (await DB.getInquiries()).map(i => i.id === id ? {...i, status:'done'} : i);
+  await DB.updateInquiries(list);
+  loadAdminInquiries(); renderInquiryList();
 }
-function resetInqStatus(id) {
-  const list = MM_DATA.getInquiries().map(i => i.id === id ? {...i, status:'read'} : i);
-  localStorage.setItem('mm_inquiries', JSON.stringify(list));
-  loadAdminInquiries();
-  renderInquiryList();
+async function resetInqStatus(id) {
+  const list = (await DB.getInquiries()).map(i => i.id === id ? {...i, status:'read'} : i);
+  await DB.updateInquiries(list);
+  loadAdminInquiries(); renderInquiryList();
 }
-function markRead(id) {
-  const list = MM_DATA.getInquiries().map(i => i.id === id ? {...i, status: i.status === 'new' ? 'read' : i.status} : i);
-  localStorage.setItem('mm_inquiries', JSON.stringify(list));
-  loadAdminInquiries();
-  renderInquiryList();
+async function markRead(id) {
+  const list = (await DB.getInquiries()).map(i => i.id === id ? {...i, status: i.status === 'new' ? 'read' : i.status} : i);
+  await DB.updateInquiries(list);
+  loadAdminInquiries(); renderInquiryList();
 }
-function deleteInquiry(id) {
+async function deleteInquiry(id) {
   if(!confirm('삭제하시겠습니까?')) return;
-  const list = MM_DATA.getInquiries().filter(i => i.id !== id);
-  localStorage.setItem('mm_inquiries', JSON.stringify(list));
+  const list = (await DB.getInquiries()).filter(i => i.id !== id);
+  await DB.updateInquiries(list);
   loadAdminInquiries();
 }
 
@@ -1151,7 +1128,7 @@ function loadAdminProjects() {
     ? `기준 ${iq.base} + 등록 ${iq.registered}`
     : `등록 ${iq.registered}건`;
 
-  const list  = getProjects();
+  const list  = (() => { try { return JSON.parse(localStorage.getItem('mm_projects') || '[]'); } catch { return []; } })();
   const tbody = document.getElementById('adminPjBody');
   if(!tbody) return;
 
@@ -1202,8 +1179,8 @@ function closePjForm() {
   document.getElementById('pjForm').style.display = 'none';
 }
 
-function editPjItem(id) {
-  const list = getProjects();
+async function editPjItem(id) {
+  const list = await getProjects();
   const p = list.find(x => x.id === id);
   if(!p) return;
   document.getElementById('pjFormTitle').textContent = '프로젝트 수정';
@@ -1216,7 +1193,7 @@ function editPjItem(id) {
   document.getElementById('pjForm').scrollIntoView({ behavior:'smooth' });
 }
 
-function savePjItem() {
+async function savePjItem() {
   const name     = document.getElementById('pj_name').value.trim();
   const platform = document.getElementById('pj_platform').value;
   const title    = document.getElementById('pj_title').value.trim();
@@ -1225,20 +1202,21 @@ function savePjItem() {
 
   if(!name||!title) { alert('성함과 프로젝트명은 필수입니다.'); return; }
 
-  let list = getProjects();
+  let list = await getProjects();
   if(editId) {
     list = list.map(p => p.id === parseInt(editId) ? {...p, name, platform, title, status} : p);
   } else {
     list.unshift({ id: Date.now(), name, platform, title, status });
   }
-  saveProjects(list);
+  await saveProjects(list);
   closePjForm();
   loadAdminProjects();
 }
 
-function deletePjItem(id) {
+async function deletePjItem(id) {
   if(!confirm('삭제하시겠습니까?')) return;
-  saveProjects(getProjects().filter(p => p.id !== id));
+  const list = await getProjects();
+  await saveProjects(list.filter(p => p.id !== id));
   loadAdminProjects();
 }
 
@@ -1291,14 +1269,15 @@ function startEditStat(type) {
   setTimeout(() => { val.focus(); val.select(); }, 30);
 }
 
-function saveEditStat(type) {
+async function saveEditStat(type) {
   const c = STAT_CFG[type]; if(!c) return;
   const val = document.getElementById(c.valId);
   if(!val) return;
   const num = parseInt(val.value, 10);
   if(isNaN(num) || num < 0) { alert('0 이상의 숫자를 입력하세요.'); return; }
-  c.setter(num);
+  await c.setter(num);
   cancelEditStat(type);
+  await DB.getStats();
   refreshAllStats();
 }
 
@@ -1318,7 +1297,8 @@ function refreshAllStats() {
 }
 
 // ── Init ──
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await DB.init();
   initMobileMenu();
   renderBlog('전체');
   initPortfolio();
@@ -1333,3 +1313,9 @@ document.addEventListener('DOMContentLoaded', () => {
     m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
   });
 });
+
+// ── MM_DATA → DB 브릿지 ──
+MM_DATA.getInquiries = function() {
+  try { return JSON.parse(localStorage.getItem('mm_inquiries') || '[]'); } catch { return []; }
+};
+MM_DATA.saveInquiry = async function(record) { await DB.saveInquiry(record); };
